@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Crest & Thread — Custom Jerseys, Cut and Stitched to Order</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+
+    --navy: #10233F;
+    --navy-deep: #0A1830;
+    --canvas: #F7F4EC;
+    --canvas-panel: #FFFFFF;
+    --ink: #101418;
+    --ink-soft: #4B5563;
+    --gold: #E0A62E;
+    --gold-accent: #D99B2B;
+    --red: #B8402A;
+    --hairline: #DDD6C4;
+    --focus: #2F6FED;
+
+    --bg: var(--canvas);
+    --bg-panel: var(--canvas-panel);
+    --text: var(--ink);
+    --text-soft: var(--ink-soft);
+    --line: var(--hairline);
+  }
+
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); scroll-behavior: smooth; }
+  *, *::before, *::after { box-sizing: inherit; }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: var(--navy-deep);
+      --bg-panel: #142A4D;
+      --text: #F2EFE6;
+      --text-soft: #B9C2D4;
+      --line: #24406B;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: var(--navy-deep);
+    --bg-panel: #142A4D;
+    --text: #F2EFE6;
+    --text-soft: #B9C2D4;
+    --line: #24406B;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .display {
+    font-family: 'Oswald', 'Inter', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    line-height: 1.05;
+    margin: 0;
+  }
+
+  img, svg { max-width: 100%; display: block; }
+  a { color: inherit; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 50;
+    background: var(--navy);
+    color: #F2EFE6;
+    border-bottom: 3px solid var(--gold-accent);
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+  .brand {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    color: #F2EFE6;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand .mark {
+    width: 30px; height: 30px;
+    flex-shrink: 0;
+  }
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+    margin: 0; padding: 0;
+  }
+  .nav-links a {
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    color: #D9DEE8;
+    transition: color .15s ease;
+  }
+  .nav-links a:hover { color: #fff; }
+  .nav-cta {
+    background: var(--gold-accent);
+    color: var(--navy-deep);
+    padding: 9px 18px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .menu-btn {
+    display: none;
+    background: none;
+    border: 1px solid #4A5B7A;
+    border-radius: 4px;
+    color: #F2EFE6;
+    width: 40px; height: 36px;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  @media (max-width: 760px) {
+    .nav-links { display: none; }
+    .nav-cta { display: none; }
+    .menu-btn { display: block; }
+    .nav-links.open {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 100%; left: 0; right: 0;
+      background: var(--navy);
+      padding: 18px 24px 24px;
+      gap: 16px;
+      border-bottom: 3px solid var(--gold-accent);
+    }
+    .nav-links.open a { font-size: 16px; }
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    background: var(--navy);
+    color: #F2EFE6;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 72px 24px 64px;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .hero .kicker {
+    color: var(--gold-accent);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-size: clamp(38px, 5.4vw, 64px);
+    color: #fff;
+    max-width: 11ch;
+  }
+  .hero p {
+    margin-top: 20px;
+    font-size: 17px;
+    color: #C7CEDC;
+    max-width: 42ch;
+    line-height: 1.6;
+  }
+  .hero-ctas {
+    margin-top: 30px;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-block;
+    padding: 13px 24px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--gold-accent);
+    color: var(--navy-deep);
+  }
+  .btn-primary:hover { background: #EBAF42; }
+  .btn-outline {
+    background: transparent;
+    color: #F2EFE6;
+    border-color: #4A5B7A;
+  }
+  .btn-outline:hover { border-color: #F2EFE6; }
+
+  .hero-visual {
+    position: relative;
+  }
+  .jersey-svg { width: 100%; height: auto; }
+
+  /* ---------- Section shell ---------- */
+  section { padding: 76px 0; }
+  .section-head {
+    max-width: 56ch;
+    margin-bottom: 44px;
+  }
+  .section-head .kicker {
+    color: var(--red);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+  .section-head h2 {
+    font-size: clamp(28px, 3.4vw, 40px);
+  }
+  .section-head p {
+    margin-top: 14px;
+    color: var(--text-soft);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* ---------- Process ---------- */
+  .process-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--line);
+  }
+  .process-step {
+    padding: 28px 22px 28px 0;
+    border-right: 1px solid var(--line);
+  }
+  .process-step:last-child { border-right: none; }
+  .process-step .num {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--red);
+    margin-bottom: 14px;
+  }
+  .process-step h3 {
+    font-size: 18px;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .process-step p {
+    color: var(--text-soft);
+    font-size: 14.5px;
+    line-height: 1.55;
+    margin: 0;
+  }
+  @media (max-width: 820px) {
+    .process-grid { grid-template-columns: 1fr 1fr; }
+    .process-step { border-bottom: 1px solid var(--line); padding: 24px 20px 24px 0; }
+    .process-step:nth-child(2n) { border-right: none; padding-left: 20px; }
+  }
+  @media (max-width: 520px) {
+    .process-grid { grid-template-columns: 1fr; }
+    .process-step { border-right: none !important; padding-left: 0 !important; }
+  }
+
+  /* ---------- Gallery ---------- */
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .gallery-card {
+    aspect-ratio: 4/5;
+    border-radius: 4px;
+    border: 1.5px dashed var(--line);
+    background: var(--bg-panel);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--text-soft);
+    text-align: center;
+    padding: 20px;
+  }
+  .gallery-card svg { width: 46px; height: 46px; opacity: 0.55; }
+  .gallery-card span { font-size: 13px; font-weight: 500; }
+  .gallery-card small { font-size: 11.5px; color: var(--text-soft); opacity: 0.8; }
+  @media (max-width: 760px) {
+    .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .gallery-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  }
+
+  /* ---------- Order form ---------- */
+  .order-section {
+    background: var(--navy);
+    color: #F2EFE6;
+  }
+  .order-section .section-head p { color: #C7CEDC; }
+  .order-section .section-head .kicker { color: var(--gold-accent); }
+  .order-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 48px;
+    align-items: start;
+  }
+  .order-notes {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid #2C4270;
+    border-radius: 6px;
+    padding: 24px;
+  }
+  .order-notes h3 {
+    font-size: 15px;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .order-notes ul { margin: 0; padding-left: 18px; color: #C7CEDC; font-size: 14px; line-height: 1.8; }
+
+  form {
+    background: var(--bg-panel);
+    border-radius: 6px;
+    padding: 32px;
+    color: var(--text);
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .field { margin-bottom: 18px; }
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .field .hint { font-size: 12px; color: var(--text-soft); font-weight: 400; margin-left: 4px; }
+  input, select, textarea {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1.5px solid var(--line);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 14.5px;
+    background: var(--bg);
+    color: var(--text);
+  }
+  textarea { resize: vertical; min-height: 90px; }
+  .submit-row { display: flex; align-items: center; gap: 16px; margin-top: 4px; flex-wrap: wrap; }
+  .form-status { font-size: 13.5px; color: var(--text-soft); }
+  .form-status.ok { color: #1B7A43; }
+  @media (max-width: 900px) {
+    .order-layout { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .form-row { grid-template-columns: 1fr; }
+    form { padding: 22px; }
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    background: var(--navy-deep);
+    color: #B9C2D4;
+    padding: 48px 0 calc(32px + env(safe-area-inset-bottom, 0px));
+    border-top: 3px solid var(--gold-accent);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 32px;
+  }
+  .footer-grid h4 {
+    color: #F2EFE6;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .footer-grid p, .footer-grid a {
+    font-size: 14px;
+    line-height: 1.9;
+    color: #B9C2D4;
+    text-decoration: none;
+  }
+  .footer-grid a:hover { color: #fff; }
+  .footer-bottom {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #24406B;
+    font-size: 12.5px;
+    color: #8493AC;
+  }
+  @media (max-width: 700px) {
+    .footer-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <a href="#top" class="brand">
+      <svg class="mark" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9 3 L4 8 L7 12 L7 27 H23 V12 L26 8 L21 3 L15 6 L9 3 Z" fill="#E0A62E" stroke="#F2EFE6" stroke-width="1"/>
+      </svg>
+      Crest &amp; Thread
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#process">How It Works</a></li>
+      <li><a href="#gallery">Our Work</a></li>
+      <li><a href="#order">Order</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a href="#order" class="nav-cta">Get a Quote</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false">☰</button>
+  </nav>
+</header>
+
+<main id="top">
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="kicker">CUSTOM JERSEYS &amp; TEAM APPAREL</div>
+        <h1>Cut, stitched, and numbered to your team's exact call.</h1>
+        <p>We take your design, your roster, and your deadline, and turn them into jerseys your team is proud to wear. Sublimated or embroidered, any sport, any size run — made to order, not off a rack.</p>
+        <div class="hero-ctas">
+          <a href="#order" class="btn btn-primary">Start Your Order</a>
+          <a href="#gallery" class="btn btn-outline">See Our Work</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <svg class="jersey-svg" viewBox="0 0 360 400" xmlns="http://www.w3.org/2000/svg">
+          <path d="M110 20 L60 55 L85 95 L110 80 V370 H250 V80 L275 95 L300 55 L250 20 C250 20 230 40 180 40 C130 40 110 20 110 20 Z"
+                fill="#0A1830" stroke="#E0A62E" stroke-width="3"/>
+          <path d="M110 20 L60 55 L85 95 L110 80" fill="none" stroke="#B8402A" stroke-width="3"/>
+          <path d="M250 20 L300 55 L275 95 L250 80" fill="none" stroke="#B8402A" stroke-width="3"/>
+          <line x1="110" y1="80" x2="110" y2="370" stroke="#B8402A" stroke-width="2" opacity="0.5"/>
+          <line x1="250" y1="80" x2="250" y2="370" stroke="#B8402A" stroke-width="2" opacity="0.5"/>
+          <text x="180" y="240" text-anchor="middle" font-family="Oswald, sans-serif" font-weight="700" font-size="130" fill="#E0A62E">7</text>
+          <text x="180" y="340" text-anchor="middle" font-family="Oswald, sans-serif" font-weight="600" font-size="26" fill="#F2EFE6" letter-spacing="4">YOUR NAME</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section id="process">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">THE PROCESS</div>
+        <h2>From sketch to sideline in four steps</h2>
+        <p>Every order goes through the same tight process, whether it's one jersey or a full roster.</p>
+      </div>
+      <div class="process-grid">
+        <div class="process-step">
+          <div class="num">01</div>
+          <h3>Consult</h3>
+          <p>Tell us the sport, sizes, and look you want. We confirm fabric, fit, and timeline before anything is cut.</p>
+        </div>
+        <div class="process-step">
+          <div class="num">02</div>
+          <h3>Design</h3>
+          <p>We mock up your colors, crest, and roster numbers and send it back for your sign-off before production.</p>
+        </div>
+        <div class="process-step">
+          <div class="num">03</div>
+          <h3>Stitch</h3>
+          <p>Approved designs go straight to the cutting table — sublimation, embroidery, or applique, done in-house.</p>
+        </div>
+        <div class="process-step">
+          <div class="num">04</div>
+          <h3>Deliver</h3>
+          <p>Quality-checked, folded, and ready for pickup or delivery — packed by player and number.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="gallery" style="background:var(--bg-panel);">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">OUR WORK</div>
+        <h2>Recent orders from the shop floor</h2>
+        <p>Send over your team's photos and we'll drop them straight into this gallery — these slots are ready and waiting.</p>
+      </div>
+      <div class="gallery-grid">
+        <div class="gallery-card">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span>Basketball jerseys</span>
+          <small>Photo coming soon</small>
+        </div>
+        <div class="gallery-card">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span>Football club kit</span>
+          <small>Photo coming soon</small>
+        </div>
+        <div class="gallery-card">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span>Esports team uniform</span>
+          <small>Photo coming soon</small>
+        </div>
+        <div class="gallery-card">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span>Company sports fest</span>
+          <small>Photo coming soon</small>
+        </div>
+        <div class="gallery-card">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span>School intramurals</span>
+          <small>Photo coming soon</small>
+        </div>
+        <div class="gallery-card">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span>Custom volleyball set</span>
+          <small>Photo coming soon</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="order" class="order-section">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">CUSTOM ORDER</div>
+        <h2>Tell us what you need made</h2>
+        <p>Fill this in with as much detail as you have. We'll follow up to confirm sizes, pricing, and your delivery date.</p>
+      </div>
+      <div class="order-layout">
+        <div class="order-notes">
+          <h3>Before you send this</h3>
+          <ul>
+            <li>Have your color scheme and any logo files ready — you can attach them when we reply to your email.</li>
+            <li>List sizes as a headcount (e.g. "5× Small, 8× Medium") rather than one size for the whole order.</li>
+            <li>Rush orders under 2 weeks may carry a rush fee — mention your deadline and we'll confirm.</li>
+            <li>Minimum order is typically 1 piece for individuals, 10+ for team sets at bulk pricing.</li>
+          </ul>
+        </div>
+
+        <form id="orderForm">
+          <div class="form-row">
+            <div class="field">
+              <label for="name">Full name</label>
+              <input type="text" id="name" name="name" required>
+            </div>
+            <div class="field">
+              <label for="contact">Phone or email</label>
+              <input type="text" id="contact" name="contact" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="itemType">What are you ordering</label>
+              <select id="itemType" name="itemType" required>
+                <option value="">Select one</option>
+                <option>Basketball jersey set</option>
+                <option>Football / soccer kit</option>
+                <option>Volleyball uniform</option>
+                <option>Esports / gaming jersey</option>
+                <option>Corporate / event shirt</option>
+                <option>Other custom apparel</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="quantity">Quantity <span class="hint">(pieces)</span></label>
+              <input type="number" id="quantity" name="quantity" min="1" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="sizes">Sizes needed</label>
+            <input type="text" id="sizes" name="sizes" placeholder="e.g. 4× S, 6× M, 3× L">
+          </div>
+
+          <div class="field">
+            <label for="details">Design details <span class="hint">(colors, crest, names/numbers, fabric preference)</span></label>
+            <textarea id="details" name="details" placeholder="Team name, colors, any logo or number layout you have in mind..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="deadline">Needed by</label>
+              <input type="date" id="deadline" name="deadline">
+            </div>
+            <div class="field">
+              <label for="budget">Budget range <span class="hint">(optional)</span></label>
+              <select id="budget" name="budget">
+                <option value="">Not sure yet</option>
+                <option>Under ₱5,000</option>
+                <option>₱5,000 – ₱15,000</option>
+                <option>₱15,000 – ₱40,000</option>
+                <option>₱40,000+</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="submit-row">
+            <button type="submit" class="btn btn-primary">Send Order Request</button>
+            <span class="form-status" id="formStatus">We'll open this as an email you can review before sending.</span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" style="background:var(--bg-panel);">
+    <div class="wrap" style="text-align:center;">
+      <h2 style="font-size:clamp(24px,3vw,34px);">Prefer to talk it through first?</h2>
+      <p style="color:var(--text-soft); margin-top:12px; max-width:48ch; margin-left:auto; margin-right:auto;">Message us directly and we'll walk you through fabric options, pricing, and turnaround before you commit to anything.</p>
+      <div style="margin-top:26px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+        <a href="mailto:orders@crestandthread.ph" class="btn btn-primary" style="background:var(--navy); color:#fff;">Email the Shop</a>
+        <a href="#" class="btn btn-outline" style="border-color:var(--line); color:var(--text);">Message on Facebook</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <h4>Crest &amp; Thread</h4>
+        <p>Custom jerseys and team apparel, cut and stitched to order. Every piece made after you confirm the design — nothing pulled off a shelf.</p>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <p><a href="#process">How It Works</a></p>
+        <p><a href="#gallery">Our Work</a></p>
+        <p><a href="#order">Custom Order</a></p>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p><a href="mailto:orders@crestandthread.ph">orders@crestandthread.ph</a></p>
+        <p>Mon–Sat, 9am–6pm</p>
+        <p>[Shop address here]</p>
+      </div>
+    </div>
+    <div class="footer-bottom">© <span id="year"></span> Crest & Thread. Placeholder branding — swap in your shop's real name, logo, and photos.</div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const menuBtn = document.getElementById('menuBtn');
+  const navLinks = document.getElementById('navLinks');
+  menuBtn.addEventListener('click', () => {
+    const open = navLinks.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    navLinks.classList.remove('open');
+    menuBtn.setAttribute('aria-expanded', 'false');
+  }));
+
+  const form = document.getElementById('orderForm');
+  const status = document.getElementById('formStatus');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const f = new FormData(form);
+    const lines = [
+      'New custom order request',
+      '',
+      'Name: ' + (f.get('name') || ''),
+      'Contact: ' + (f.get('contact') || ''),
+      'Item: ' + (f.get('itemType') || ''),
+      'Quantity: ' + (f.get('quantity') || ''),
+      'Sizes: ' + (f.get('sizes') || 'Not specified'),
+      'Details: ' + (f.get('details') || 'None provided'),
+      'Needed by: ' + (f.get('deadline') || 'Not specified'),
+      'Budget range: ' + (f.get('budget') || 'Not specified')
+    ];
+    const body = encodeURIComponent(lines.join('\n'));
+    const subject = encodeURIComponent('Custom Jersey Order — ' + (f.get('name') || 'New Inquiry'));
+    try {
+      window.location.href = 'mailto:orders@crestandthread.ph?subject=' + subject + '&body=' + body;
+      status.textContent = 'Opening your email app with the order filled in — review and hit send.';
+      status.classList.add('ok');
+    } catch (err) {
+      status.textContent = 'Could not open your email app. Please email orders@crestandthread.ph directly.';
+    }
+  });
+</script>
+
+</body>
+</html>
