@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orders — Jueh Tailoring Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    box-sizing: border-box;
+    --sky-top: #0B1345;
+    --horizon: #E89A4C;
+    --horizon-deep: #C15A3A;
+    --canvas: #F7F4EC;
+    --canvas-panel: #FFFFFF;
+    --ink: #101418;
+    --ink-soft: #4B5563;
+    --hairline: #DDD6C4;
+    --focus: #2F6FED;
+    --ok: #1B7A43;
+    --err: #B3261E;
+  }
+  *, *::before, *::after { box-sizing: inherit; }
+  body {
+    margin: 0;
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, .display {
+    font-family: 'Oswald', 'Inter', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    line-height: 1.05;
+    margin: 0;
+  }
+  a { color: inherit; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+  header {
+    background: var(--sky-top);
+    color: #F2EFE6;
+    border-bottom: 3px solid var(--horizon);
+    padding: 16px 24px;
+  }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; padding: 0; }
+  header h1 { font-size: 18px; }
+  header a.back { font-size: 13px; color: #D9DEE8; text-decoration: none; }
+  header a.back:hover { color: #fff; }
+
+  main { padding: 40px 0 80px; }
+
+  /* Login gate */
+  .gate {
+    max-width: 360px;
+    margin: 80px auto 0;
+    background: var(--canvas-panel);
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    padding: 32px;
+    text-align: center;
+  }
+  .gate h2 { font-size: 22px; margin-bottom: 8px; }
+  .gate p { color: var(--ink-soft); font-size: 14px; margin: 0 0 20px; }
+  .gate input {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 15px;
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    margin-bottom: 12px;
+    font-family: inherit;
+  }
+  .gate input:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+  .gate button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(90deg, var(--horizon-deep), var(--horizon));
+    color: #1A1206;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .gate .err { color: var(--err); font-size: 13px; margin-top: 10px; min-height: 16px; }
+
+  /* Orders view */
+  #ordersView { display: none; }
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .toolbar h2 { font-size: 24px; }
+  .toolbar .actions { display: flex; gap: 10px; }
+  .toolbar button, .toolbar input[type="search"] {
+    font-family: inherit;
+    font-size: 14px;
+    padding: 9px 14px;
+    border-radius: 4px;
+    border: 1px solid var(--hairline);
+    background: var(--canvas-panel);
+    cursor: pointer;
+  }
+  .toolbar input[type="search"] { cursor: text; min-width: 200px; }
+  .toolbar button.refresh { color: var(--ink); }
+  .toolbar button.logout { color: var(--err); border-color: var(--err); }
+
+  .status-line { color: var(--ink-soft); font-size: 13px; margin-bottom: 14px; }
+
+  .order-list { display: flex; flex-direction: column; gap: 12px; }
+  .order-card {
+    background: var(--canvas-panel);
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+  .order-card .row1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .order-card .name { font-weight: 700; font-size: 16px; }
+  .order-card .timestamp { color: var(--ink-soft); font-size: 12px; }
+  .order-card .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px 20px;
+    font-size: 14px;
+  }
+  .order-card .field label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    margin-bottom: 2px;
+  }
+  .order-card .details-full {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--hairline);
+    font-size: 14px;
+    white-space: pre-wrap;
+  }
+  .empty, .loading {
+    text-align: center;
+    color: var(--ink-soft);
+    padding: 60px 20px;
+    font-size: 15px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Jueh Tailoring — Orders</h1>
+    <a class="back" href="tailoring-shop.html">← Back to site</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <div class="gate" id="gate">
+      <h2>Enter passcode</h2>
+      <p>This page is only for the shop owner.</p>
+      <input type="password" id="passcodeInput" placeholder="Passcode" autocomplete="off">
+      <button id="loginBtn">View Orders</button>
+      <div class="err" id="gateErr"></div>
+    </div>
+
+    <div id="ordersView">
+      <div class="toolbar">
+        <h2>Orders</h2>
+        <div class="actions">
+          <input type="search" id="searchBox" placeholder="Search name, item, contact...">
+          <button class="refresh" id="refreshBtn">Refresh</button>
+          <button class="logout" id="logoutBtn">Log out</button>
+        </div>
+      </div>
+      <div class="status-line" id="statusLine"></div>
+      <div id="listContainer"></div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  // ---- EDIT THIS with your deployed Apps Script web app URL ----
+  const SHEETS_WEBAPP_URL = 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'; // ends in /exec
+  // ----------------------------------------------------------------
+
+  const gate = document.getElementById('gate');
+  const ordersView = document.getElementById('ordersView');
+  const passcodeInput = document.getElementById('passcodeInput');
+  const loginBtn = document.getElementById('loginBtn');
+  const gateErr = document.getElementById('gateErr');
+  const statusLine = document.getElementById('statusLine');
+  const listContainer = document.getElementById('listContainer');
+  const searchBox = document.getElementById('searchBox');
+  const refreshBtn = document.getElementById('refreshBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  let currentPasscode = '';
+  let allOrders = [];
+
+  // Remember passcode for this browser tab session only (not persisted to disk)
+  currentPasscode = sessionStorage.getItem('jueh_admin_passcode') || '';
+  if (currentPasscode) {
+    tryLoadOrders(currentPasscode, true);
+  }
+
+  loginBtn.addEventListener('click', () => attemptLogin());
+  passcodeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') attemptLogin(); });
+
+  function attemptLogin() {
+    const val = passcodeInput.value.trim();
+    if (!val) return;
+    tryLoadOrders(val, false);
+  }
+
+  function tryLoadOrders(passcode, silentFail) {
+    if (!SHEETS_WEBAPP_URL || SHEETS_WEBAPP_URL.indexOf('PASTE_YOUR') !== -1) {
+      gateErr.textContent = 'Admin page isn\'t connected yet — the web app URL still needs to be set.';
+      return;
+    }
+    gateErr.textContent = '';
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Checking...';
+
+    fetch(SHEETS_WEBAPP_URL + '?passcode=' + encodeURIComponent(passcode))
+      .then(r => r.json())
+      .then(data => {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'View Orders';
+        if (data.status === 'ok') {
+          currentPasscode = passcode;
+          sessionStorage.setItem('jueh_admin_passcode', passcode);
+          allOrders = data.orders || [];
+          showOrders();
+        } else {
+          if (!silentFail) {
+            gateErr.textContent = data.message || 'Incorrect passcode.';
+          } else {
+            sessionStorage.removeItem('jueh_admin_passcode');
+          }
+        }
+      })
+      .catch(err => {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'View Orders';
+        if (!silentFail) {
+          gateErr.textContent = 'Could not reach the order log. Check your connection and try again.';
+        }
+      });
+  }
+
+  function showOrders() {
+    gate.style.display = 'none';
+    ordersView.style.display = 'block';
+    renderOrders(allOrders);
+  }
+
+  function renderOrders(orders) {
+    statusLine.textContent = orders.length + ' order' + (orders.length === 1 ? '' : 's');
+    if (orders.length === 0) {
+      listContainer.innerHTML = '<div class="empty">No orders yet.</div>';
+      return;
+    }
+    listContainer.innerHTML = '<div class="order-list">' + orders.map(orderCardHtml).join('') + '</div>';
+  }
+
+  function esc(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function fmtDate(val) {
+    if (!val) return '—';
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return esc(val);
+    return d.toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' });
+  }
+
+  function orderCardHtml(o) {
+    return '' +
+      '<div class="order-card">' +
+        '<div class="row1">' +
+          '<span class="name">' + esc(o['Name']) + '</span>' +
+          '<span class="timestamp">' + fmtDate(o['Timestamp']) + '</span>' +
+        '</div>' +
+        '<div class="grid">' +
+          field('Contact', o['Contact']) +
+          field('Item Type', o['Item Type']) +
+          field('Quantity', o['Quantity']) +
+          field('Sizes', o['Sizes']) +
+          field('Needed By', o['Needed By']) +
+          field('Budget Range', o['Budget Range']) +
+        '</div>' +
+        (o['Design Details'] ? '<div class="details-full"><label style="text-transform:uppercase;font-size:11px;color:var(--ink-soft);letter-spacing:.04em;">Design Details</label><br>' + esc(o['Design Details']) + '</div>' : '') +
+      '</div>';
+  }
+
+  function field(label, value) {
+    return '<div class="field"><label>' + esc(label) + '</label>' + esc(value || '—') + '</div>';
+  }
+
+  refreshBtn.addEventListener('click', () => {
+    if (currentPasscode) tryLoadOrders(currentPasscode, false);
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    sessionStorage.removeItem('jueh_admin_passcode');
+    currentPasscode = '';
+    allOrders = [];
+    passcodeInput.value = '';
+    ordersView.style.display = 'none';
+    gate.style.display = 'block';
+  });
+
+  searchBox.addEventListener('input', () => {
+    const q = searchBox.value.trim().toLowerCase();
+    if (!q) { renderOrders(allOrders); return; }
+    const filtered = allOrders.filter(o =>
+      Object.values(o).some(v => String(v || '').toLowerCase().includes(q))
+    );
+    renderOrders(filtered);
+  });
+</script>
+
+</body>
+</html>
