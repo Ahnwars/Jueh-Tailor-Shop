@@ -20,7 +20,7 @@
  * then use that same passcode on the admin page.
  */
 
-var ADMIN_PASSCODE = 'CHANGE_ME'; // set this, then use it to log into admin.html
+var ADMIN_PASSCODE = 'Christ'; // set this, then use it to log into admin.html
 
 function doGet(e) {
   var p = e.parameter || {};
