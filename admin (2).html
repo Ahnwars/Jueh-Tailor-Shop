@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Site Control — Jueh Tailoring Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    box-sizing: border-box;
+    --sky-top: #0B1345;
+    --horizon: #E89A4C;
+    --horizon-deep: #C15A3A;
+    --canvas: #F7F4EC;
+    --canvas-panel: #FFFFFF;
+    --ink: #101418;
+    --ink-soft: #4B5563;
+    --hairline: #DDD6C4;
+    --focus: #2F6FED;
+    --ok: #1B7A43;
+    --err: #B3261E;
+  }
+  *, *::before, *::after { box-sizing: inherit; }
+  body { margin: 0; background: var(--canvas); color: var(--ink); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing: antialiased; }
+  h1, h2, .display { font-family: 'Oswald', 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.01em; line-height: 1.05; margin: 0; }
+  a { color: inherit; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 0 24px; }
+
+  header { background: var(--sky-top); color: #F2EFE6; border-bottom: 3px solid var(--horizon); padding: 16px 24px; }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; padding: 0; max-width: 1120px; }
+  header h1 { font-size: 18px; }
+  header a.back { font-size: 13px; color: #D9DEE8; text-decoration: none; }
+  header a.back:hover { color: #fff; }
+
+  main { padding: 60px 0 80px; }
+
+  .gate { background: var(--canvas-panel); border: 1px solid var(--hairline); border-radius: 8px; padding: 32px; text-align: center; }
+  .gate h2 { font-size: 22px; margin-bottom: 8px; }
+  .gate p { color: var(--ink-soft); font-size: 14px; margin: 0 0 20px; }
+  .gate input { width: 100%; padding: 11px 14px; font-size: 15px; border: 1px solid var(--hairline); border-radius: 4px; margin-bottom: 12px; font-family: inherit; }
+  .gate input:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+  .gate button { width: 100%; padding: 12px; background: linear-gradient(90deg, var(--horizon-deep), var(--horizon)); color: #1A1206; border: none; border-radius: 4px; font-weight: 600; font-size: 15px; cursor: pointer; font-family: inherit; }
+  .gate .err { color: var(--err); font-size: 13px; margin-top: 10px; min-height: 16px; }
+
+  #controlView { display: none; }
+  .panel { background: var(--canvas-panel); border: 1px solid var(--hairline); border-radius: 8px; padding: 32px; text-align: center; }
+  .panel h2 { font-size: 22px; margin-bottom: 6px; }
+  .panel p.sub { color: var(--ink-soft); font-size: 14px; margin: 0 0 26px; }
+
+  .status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 30px; font-weight: 700; font-size: 15px; margin-bottom: 26px; }
+  .status-pill.open { background: #E4F3E9; color: var(--ok); }
+  .status-pill.closed { background: #FBE8E7; color: var(--err); }
+  .status-pill .dot { width: 10px; height: 10px; border-radius: 50%; background: currentColor; }
+
+  .toggle-btn { display: block; width: 100%; padding: 16px; font-family: inherit; font-size: 16px; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; color: #fff; }
+  .toggle-btn.to-close { background: var(--err); }
+  .toggle-btn.to-open { background: var(--ok); }
+  .toggle-btn:disabled { opacity: .6; cursor: default; }
+
+  .msg { font-size: 13px; margin-top: 14px; min-height: 16px; }
+  .msg.ok { color: var(--ok); }
+  .msg.err { color: var(--err); }
+
+  .links { margin-top: 32px; font-size: 13px; color: var(--ink-soft); }
+  .links a { color: var(--sky-top); text-decoration: underline; }
+
+  .logout-row { text-align: center; margin-top: 20px; }
+  .logout-row button { background: none; border: 1px solid var(--hairline); color: var(--err); border-color: var(--err); font-family: inherit; font-size: 13px; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Jueh Tailoring — Site Control</h1>
+    <a class="back" href="tailoring-shop.html">← Back to site</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <div class="gate" id="gate">
+      <h2>Enter admin passcode</h2>
+      <p>This controls whether the site accepts orders.</p>
+      <input type="password" id="passcodeInput" placeholder="Passcode" autocomplete="off">
+      <button id="loginBtn">Continue</button>
+      <div class="err" id="gateErr"></div>
+    </div>
+
+    <div id="controlView">
+      <div class="panel">
+        <h2>Ordering Status</h2>
+        <p class="sub">Control whether customers can submit new orders on the website.</p>
+        <div id="pillWrap"></div>
+        <button id="toggleBtn" class="toggle-btn"></button>
+        <div class="msg" id="msgLine"></div>
+        <div class="links">
+          <a href="tailoring-shop.html">View customer site</a> ·
+          <a href="owner.html">Owner order view</a>
+        </div>
+      </div>
+      <div class="logout-row"><button id="logoutBtn">Log out</button></div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  // ---- EDIT THIS with your deployed Apps Script web app URL ----
+  const SHEETS_WEBAPP_URL = 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'; // ends in /exec
+  // ----------------------------------------------------------------
+
+  const gate = document.getElementById('gate');
+  const controlView = document.getElementById('controlView');
+  const passcodeInput = document.getElementById('passcodeInput');
+  const loginBtn = document.getElementById('loginBtn');
+  const gateErr = document.getElementById('gateErr');
+  const pillWrap = document.getElementById('pillWrap');
+  const toggleBtn = document.getElementById('toggleBtn');
+  const msgLine = document.getElementById('msgLine');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  let currentPasscode = '';
+  let siteOpen = true;
+
+  function callApi(action, params) {
+    return fetch(SHEETS_WEBAPP_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(Object.assign({ action: action }, params))
+    }).then(r => r.json());
+  }
+
+  currentPasscode = sessionStorage.getItem('jueh_admin_passcode') || '';
+  if (currentPasscode) tryLogin(currentPasscode, true);
+
+  loginBtn.addEventListener('click', () => attempt());
+  passcodeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') attempt(); });
+
+  function attempt() {
+    const val = passcodeInput.value.trim();
+    if (!val) return;
+    tryLogin(val, false);
+  }
+
+  function tryLogin(passcode, silentFail) {
+    if (!SHEETS_WEBAPP_URL || SHEETS_WEBAPP_URL.indexOf('PASTE_YOUR') !== -1) {
+      gateErr.textContent = 'This page isn\'t connected yet — the web app URL still needs to be set.';
+      return;
+    }
+    gateErr.textContent = '';
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Checking...';
+
+    // Passcode is verified implicitly on first setSiteStatus/getSiteStatus call;
+    // read the public status first, then confirm the passcode by attempting a no-op set.
+    callApi('getSiteStatus', {}).then(data => {
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Continue';
+      if (data.status !== 'ok') {
+        if (!silentFail) gateErr.textContent = 'Could not reach the order system.';
+        return;
+      }
+      siteOpen = data.open;
+      // Confirm passcode by re-setting the status to its current value.
+      callApi('setSiteStatus', { passcode: passcode, open: siteOpen }).then(res => {
+        if (res.status === 'ok') {
+          currentPasscode = passcode;
+          sessionStorage.setItem('jueh_admin_passcode', passcode);
+          showControl();
+        } else if (!silentFail) {
+          gateErr.textContent = res.message || 'Incorrect passcode.';
+        } else {
+          sessionStorage.removeItem('jueh_admin_passcode');
+        }
+      });
+    }).catch(() => {
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Continue';
+      if (!silentFail) gateErr.textContent = 'Could not reach the order system. Check your connection.';
+    });
+  }
+
+  function showControl() {
+    gate.style.display = 'none';
+    controlView.style.display = 'block';
+    renderStatus();
+  }
+
+  function renderStatus() {
+    pillWrap.innerHTML = siteOpen
+      ? '<div class="status-pill open"><span class="dot"></span> Site is OPEN — accepting orders</div>'
+      : '<div class="status-pill closed"><span class="dot"></span> Site is CLOSED — orders paused</div>';
+    if (siteOpen) {
+      toggleBtn.className = 'toggle-btn to-close';
+      toggleBtn.textContent = 'Close ordering';
+    } else {
+      toggleBtn.className = 'toggle-btn to-open';
+      toggleBtn.textContent = 'Reopen ordering';
+    }
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    const newState = !siteOpen;
+    toggleBtn.disabled = true;
+    msgLine.textContent = '';
+    callApi('setSiteStatus', { passcode: currentPasscode, open: newState }).then(res => {
+      toggleBtn.disabled = false;
+      if (res.status === 'ok') {
+        siteOpen = newState;
+        renderStatus();
+        msgLine.className = 'msg ok';
+        msgLine.textContent = 'Updated.';
+      } else {
+        msgLine.className = 'msg err';
+        msgLine.textContent = res.message || 'Could not update.';
+      }
+    }).catch(() => {
+      toggleBtn.disabled = false;
+      msgLine.className = 'msg err';
+      msgLine.textContent = 'Connection error — try again.';
+    });
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    sessionStorage.removeItem('jueh_admin_passcode');
+    currentPasscode = '';
+    passcodeInput.value = '';
+    controlView.style.display = 'none';
+    gate.style.display = 'block';
+  });
+</script>
+
+</body>
+</html>
