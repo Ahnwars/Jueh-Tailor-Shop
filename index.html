@@ -728,11 +728,11 @@
   const orderSection = document.getElementById('order');
 
   function callApi(action, params) {
-    return fetch(SHEETS_WEBAPP_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids CORS preflight
-      body: JSON.stringify(Object.assign({ action: action }, params))
-    }).then(function (r) { return r.json(); });
+    var qs = Object.assign({ action: action }, params);
+    var url = SHEETS_WEBAPP_URL + '?' + Object.keys(qs).map(function(k) {
+      return encodeURIComponent(k) + '=' + encodeURIComponent(qs[k]);
+    }).join('&');
+    return fetch(url).then(function (r) { return r.json(); });
   }
 
   // Check whether the shop is currently accepting orders.
