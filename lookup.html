@@ -106,7 +106,7 @@
 
 <script>
   // ---- EDIT THIS with your deployed Apps Script web app URL ----
-  const SHEETS_WEBAPP_URL = 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'; // ends in /exec
+  const SHEETS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwzppyOx1dsAbJPlCZZ1Tlv_dm5PYJPaYTVRSXK0IxkAg8O1IoVU1TGGZ5uuXHFxwpY/exec'; // ends in /exec
   // ----------------------------------------------------------------
 
   const orderIdInput = document.getElementById('orderId');
@@ -120,11 +120,11 @@
   const noteText = document.getElementById('noteText');
 
   function callApi(action, params) {
-    return fetch(SHEETS_WEBAPP_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(Object.assign({ action: action }, params))
-    }).then(r => r.json());
+    const qs = Object.assign({ action: action }, params);
+    const url = SHEETS_WEBAPP_URL + '?' + Object.keys(qs).map(k =>
+      encodeURIComponent(k) + '=' + encodeURIComponent(qs[k])
+    ).join('&');
+    return fetch(url).then(r => r.json());
   }
 
   function esc(str) {
