@@ -127,11 +127,11 @@
   let siteOpen = true;
 
   function callApi(action, params) {
-    return fetch(SHEETS_WEBAPP_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(Object.assign({ action: action }, params))
-    }).then(r => r.json());
+    const qs = Object.assign({ action: action }, params);
+    const url = SHEETS_WEBAPP_URL + '?' + Object.keys(qs).map(k =>
+      encodeURIComponent(k) + '=' + encodeURIComponent(qs[k])
+    ).join('&');
+    return fetch(url).then(r => r.json());
   }
 
   currentPasscode = sessionStorage.getItem('jueh_admin_passcode') || '';
