@@ -110,7 +110,7 @@
 
 <script>
   // ---- EDIT THIS with your deployed Apps Script web app URL ----
-  const SHEETS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwzppyOx1dsAbJPlCZZ1Tlv_dm5PYJPaYTVRSXK0IxkAg8O1IoVU1TGGZ5uuXHFxwpY/exec'; // ends in /exec
+  const SHEETS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyHen3-Ifrt8D_D91V0TgE4zzPrpStrf-LzvUvIg6Jm0mO6fW89iDEGJ9K8tV53Lved/exec'; // ends in /exec
   // ----------------------------------------------------------------
 
   const gate = document.getElementById('gate');
@@ -127,11 +127,26 @@
   let siteOpen = true;
 
   function callApi(action, params) {
-    const qs = Object.assign({ action: action }, params);
-    const url = SHEETS_WEBAPP_URL + '?' + Object.keys(qs).map(k =>
-      encodeURIComponent(k) + '=' + encodeURIComponent(qs[k])
-    ).join('&');
-    return fetch(url).then(r => r.json());
+    return new Promise(function(resolve, reject) {
+      var cbName = 'jsonp_' + Date.now() + '_' + Math.floor(Math.random()*9999);
+      var qs = Object.assign({ action: action, callback: cbName }, params || {});
+      var url = SHEETS_WEBAPP_URL + '?' + Object.keys(qs).map(function(k) {
+        return encodeURIComponent(k) + '=' + encodeURIComponent(qs[k]);
+      }).join('&');
+      window[cbName] = function(data) {
+        delete window[cbName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        resolve(data);
+      };
+      var script = document.createElement('script');
+      script.src = url;
+      script.onerror = function() {
+        delete window[cbName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        reject(new Error('Request failed'));
+      };
+      document.body.appendChild(script);
+    });
   }
 
   currentPasscode = sessionStorage.getItem('jueh_admin_passcode') || '';
