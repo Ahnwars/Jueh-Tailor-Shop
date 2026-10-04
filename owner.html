@@ -27,22 +27,20 @@ header h1{font-size:18px;flex:1;}
 
 main{padding:48px 0 80px;}
 
-/* Gate */
 .gate{max-width:400px;margin:0 auto;}
 .panel{background:var(--panel);border:1px solid var(--hair);border-radius:10px;padding:28px;}
 .panel h2{font-size:20px;margin-bottom:6px;text-align:center;}
 .panel .sub{color:var(--soft);font-size:13px;margin-bottom:20px;text-align:center;}
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--soft);margin-bottom:5px;}
-.field input,.field select,.field textarea{width:100%;padding:10px 13px;font-size:14px;border:1.5px solid var(--hair);border-radius:5px;font-family:inherit;background:var(--canvas);transition:border-color .2s;}
+.field input,.field select,.field textarea{width:100%;padding:10px 13px;font-size:14px;border:1.5px solid var(--hair);border-radius:5px;font-family:inherit;background:var(--canvas);transition:border-color .2s,box-shadow .2s;}
 .field input:focus-visible,.field select:focus-visible,.field textarea:focus-visible{outline:none;border-color:var(--focus);box-shadow:0 0 0 3px rgba(47,111,237,.15);}
 .field textarea{resize:vertical;min-height:70px;}
-.btn-primary{width:100%;padding:12px;background:linear-gradient(90deg,var(--horizon-deep),var(--horizon));color:#1A1206;border:none;border-radius:5px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;transition:opacity .2s,transform .15s;margin-top:4px;}
+.btn-primary{width:100%;padding:12px;background:linear-gradient(90deg,var(--horizon-deep),var(--horizon));color:#1A1206;border:none;border-radius:5px;font-weight:700;font-size:15px;cursor:pointer;transition:opacity .2s,transform .2s;}
 .btn-primary:hover{opacity:.9;transform:translateY(-1px);}
 .btn-primary:disabled{opacity:.6;cursor:default;transform:none;}
 .err-msg{color:var(--err);font-size:13px;margin-top:10px;text-align:center;min-height:14px;}
 
-/* Dashboard */
 #dashboard{display:none;}
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center;}
 .toolbar input{flex:1;min-width:160px;padding:9px 13px;font-size:14px;border:1.5px solid var(--hair);border-radius:5px;font-family:inherit;background:var(--panel);}
@@ -50,7 +48,6 @@ main{padding:48px 0 80px;}
 .toolbar select{padding:9px 13px;font-size:14px;border:1.5px solid var(--hair);border-radius:5px;font-family:inherit;background:var(--panel);cursor:pointer;}
 .count{font-size:13px;color:var(--soft);white-space:nowrap;}
 
-/* Order cards */
 .orders{display:flex;flex-direction:column;gap:14px;}
 .card{background:var(--panel);border:1px solid var(--hair);border-radius:8px;padding:20px;animation:fadeUp .3s ease both;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -70,7 +67,6 @@ main{padding:48px 0 80px;}
 .btn-save:disabled{opacity:.6;cursor:default;}
 .btn-save.saved{background:var(--ok);}
 
-/* Pagination */
 .pager{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:24px;flex-wrap:wrap;}
 .pager button{padding:7px 13px;border:1.5px solid var(--hair);border-radius:4px;background:var(--panel);font-size:13px;cursor:pointer;font-family:inherit;transition:background .2s,border-color .2s;}
 .pager button:hover{border-color:var(--focus);background:#EEF3FD;}
@@ -92,7 +88,6 @@ main{padding:48px 0 80px;}
 
 <main>
   <div class="wrap">
-    <!-- Gate -->
     <div class="gate" id="gate">
       <div class="panel">
         <h2>Owner Access</h2>
@@ -106,7 +101,6 @@ main{padding:48px 0 80px;}
       </div>
     </div>
 
-    <!-- Dashboard -->
     <div id="dashboard">
       <div class="toolbar">
         <input type="search" id="searchBox" placeholder="Search order ID, name, item…">
@@ -131,6 +125,11 @@ const PAGE_SIZE = 20;
 let allOrders = [], filtered = [], currentPage = 1, savedPasscode = '';
 
 const $ = id => document.getElementById(id);
+function normalizePasscode(value) { return String(value == null ? '' : value).trim(); }
+function passcodeVariants(value) {
+  const base = normalizePasscode(value);
+  return Array.from(new Set([base, base.toLowerCase(), base.toUpperCase()].filter(Boolean)));
+}
 
 function callApi(action, params) {
   return new Promise(function(resolve, reject) {
@@ -152,27 +151,53 @@ function fmtDate(v) {
   return isNaN(d) ? esc(v) : d.toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' });
 }
 
-// Login
 $('loginBtn').addEventListener('click', doLogin);
 $('passcode').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
 function doLogin() {
-  const pc = $('passcode').value.trim();
-  if (!pc) { $('gateErr').textContent = 'Enter your passcode.'; return; }
+  const passcode = normalizePasscode($('passcode').value);
+  if (!passcode) { $('gateErr').textContent = 'Enter your passcode.'; return; }
+
   $('loginBtn').disabled = true;
   $('loginBtn').textContent = 'Checking…';
-  callApi('getOrders', { passcode: pc }).then(function(res) {
-    $('loginBtn').disabled = false;
-    $('loginBtn').textContent = 'Enter';
-    if (res.status !== 'ok') { $('gateErr').textContent = res.message || 'Wrong passcode.'; return; }
-    savedPasscode = pc;
-    sessionStorage.setItem('ownerPc', pc);
-    showDashboard(res.orders || []);
-  }).catch(function() {
-    $('loginBtn').disabled = false;
-    $('loginBtn').textContent = 'Enter';
-    $('gateErr').textContent = 'Connection error. Try again.';
-  });
+
+  const variants = passcodeVariants(passcode);
+  let attemptIndex = 0;
+
+  function attemptNext() {
+    const candidate = variants[attemptIndex];
+    if (!candidate) {
+      $('loginBtn').disabled = false;
+      $('loginBtn').textContent = 'Enter';
+      $('gateErr').textContent = 'Wrong passcode.';
+      return;
+    }
+
+    callApi('getOrders', { passcode: candidate }).then(function(res) {
+      if (res.status !== 'ok') {
+        attemptIndex += 1;
+        attemptNext();
+        return;
+      }
+
+      $('loginBtn').disabled = false;
+      $('loginBtn').textContent = 'Enter';
+      savedPasscode = candidate;
+      sessionStorage.setItem('ownerPc', candidate);
+      showDashboard(res.orders || []);
+    }).catch(function() {
+      if (attemptIndex < variants.length - 1) {
+        attemptIndex += 1;
+        attemptNext();
+        return;
+      }
+      $('loginBtn').disabled = false;
+      $('loginBtn').textContent = 'Enter';
+      $('gateErr').textContent = 'Connection error. Try again.';
+    });
+  }
+
+  attemptNext();
 }
 
 function showDashboard(orders) {
@@ -243,10 +268,8 @@ function render() {
     </div>`;
   }).join('');
 
-  // Pager
   renderPager(pages);
 
-  // Save handlers
   list.querySelectorAll('.btn-save').forEach(function(btn) {
     btn.addEventListener('click', function() {
       const idx = parseInt(btn.dataset.idx);
@@ -262,7 +285,6 @@ function render() {
         if (res.status === 'ok') {
           filtered[idx]['Status'] = newSt;
           filtered[idx]['Owner Note'] = note;
-          // update allOrders too
           const orig = allOrders.find(o => o['Order ID'] === orderId);
           if (orig) { orig['Status'] = newSt; orig['Owner Note'] = note; }
           btn.textContent = '✓ Saved';
@@ -317,7 +339,6 @@ $('logoutBtn').addEventListener('click', function() {
   $('gateErr').textContent = '';
 });
 
-// Session restore
 (function() {
   const pc = sessionStorage.getItem('ownerPc');
   if (!pc) return;
