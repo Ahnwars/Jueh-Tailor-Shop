@@ -100,7 +100,7 @@ main{padding:48px 0 80px;}
 <header>
   <div class="inner">
     <h1>Jueh Tailoring</h1>
-    <span class="admin-chip">Admin</span>
+    <span class="admin-chip" id="roleBadge">Dashboard</span>
     <button class="btn-sm btn-logout" id="logoutBtn" style="display:none;">Log out</button>
   </div>
 </header>
@@ -159,7 +159,7 @@ main{padding:48px 0 80px;}
 
       <!-- Orders -->
       <div class="toolbar">
-        <input type="search" id="searchBox" placeholder="Search order ID, name, item…">
+        <input type="search" id="searchBox" placeholder="Search order ID, name, item, note…">
         <select id="filterStatus">
           <option value="">All statuses</option>
           <option value="New">New</option>
@@ -184,20 +184,42 @@ let savedPasscode = '', isAdmin = false, siteOpen = true, toggleBusy = false;
 
 const $ = id => document.getElementById(id);
 
-function callApi(action, params) {
+// API Call helper with timeout protection
+function callApi(action, params, timeoutMs = 12000) {
   return new Promise(function(resolve, reject) {
     var cb = 'jsonp_' + Date.now() + '_' + Math.random().toString(36).slice(2);
     var qs = Object.assign({ action, callback: cb }, params || {});
     var url = SHEETS_WEBAPP_URL + '?' + Object.keys(qs).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(qs[k])).join('&');
-    window[cb] = function(data) { delete window[cb]; sc.parentNode && sc.parentNode.removeChild(sc); resolve(data); };
+    
     var sc = document.createElement('script');
+
+    var timer = setTimeout(function() {
+      cleanup();
+      reject(new Error('Request timed out'));
+    }, timeoutMs);
+
+    function cleanup() {
+      clearTimeout(timer);
+      delete window[cb];
+      if (sc && sc.parentNode) sc.parentNode.removeChild(sc);
+    }
+
+    window[cb] = function(data) {
+      cleanup();
+      resolve(data);
+    };
+
     sc.src = url;
-    sc.onerror = function() { delete window[cb]; sc.parentNode && sc.parentNode.removeChild(sc); reject(new Error('failed')); };
+    sc.onerror = function() {
+      cleanup();
+      reject(new Error('Network error'));
+    };
     document.body.appendChild(sc);
   });
 }
 
 function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
 function fmtDate(v) {
   if (!v) return '—';
   const d = new Date(v);
@@ -210,44 +232,53 @@ document.querySelectorAll('.gate-tab').forEach(function(tab) {
     document.querySelectorAll('.gate-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.gate-tab-pane').forEach(p => p.classList.remove('active'));
     tab.classList.add('active');
-    $('tab-' + tab.dataset.tab).classList.add('active');
-    $('gateErr').textContent = '';
+    $('tab-' + tab.dataset.tab).classList.add('active');$('gateErr').textContent = '';
   });
 });
 
 // Login handlers
-$('ownerLoginBtn').addEventListener('click', function() { doLogin($('ownerPc').value.trim(), false, $('ownerLoginBtn')); });
-$('adminLoginBtn').addEventListener('click', function() { doLogin($('adminPc').value.trim(), true, $('adminLoginBtn')); });
-$('ownerPc').addEventListener('keydown', e => { if (e.key === 'Enter') $('ownerLoginBtn').click(); });
-$('adminPc').addEventListener('keydown', e => { if (e.key === 'Enter') $('adminLoginBtn').click(); });
+$('ownerLoginBtn').addEventListener('click', function() { doLogin($('ownerPc').value.trim(), false, $('ownerLoginBtn')); });$('adminLoginBtn').addEventListener('click', function() { doLogin($('adminPc').value.trim(), true,$('adminLoginBtn')); });
+$('ownerPc').addEventListener('keydown', e => { if (e.key === 'Enter')$('ownerLoginBtn').click(); });
+$('adminPc').addEventListener('keydown', e => { if (e.key === 'Enter')$('adminLoginBtn').click(); });
 
-function doLogin(pc, asAdmin, btn) {
+function doLogin(pc, asAdminRequested, btn) {
   if (!pc) { $('gateErr').textContent = 'Enter your passcode.'; return; }
   btn.disabled = true; btn.textContent = 'Checking…';
+  
   callApi('getOrders', { passcode: pc }).then(function(res) {
-    btn.disabled = false; btn.textContent = asAdmin ? 'Enter as Admin' : 'Enter as Owner';
-    if (res.status !== 'ok') { $('gateErr').textContent = res.message || 'Wrong passcode.'; return; }
+    btn.disabled = false; btn.textContent = asAdminRequested ? 'Enter as Admin' : 'Enter as Owner';
+    
+    if (res.status !== 'ok') { 
+      $('gateErr').textContent = res.message || 'Wrong passcode.'; 
+      return; 
+    }
+    
     savedPasscode = pc;
-    isAdmin = asAdmin;
+    // Determine admin status from backend response if provided, falling back to request intent
+    isAdmin = (res.role === 'admin') || (res.isAdmin === true) || (res.role === undefined && asAdminRequested);
+    
     sessionStorage.setItem('adminPc', pc);
-    sessionStorage.setItem('adminRole', asAdmin ? '1' : '0');
+    sessionStorage.setItem('adminRole', isAdmin ? '1' : '0');
     showDashboard(res.orders || []);
-  }).catch(function() {
-    btn.disabled = false; btn.textContent = asAdmin ? 'Enter as Admin' : 'Enter as Owner';
-    $('gateErr').textContent = 'Connection error. Try again.';
+  }).catch(function(err) {
+    btn.disabled = false; btn.textContent = asAdminRequested ? 'Enter as Admin' : 'Enter as Owner';
+    $('gateErr').textContent = err.message === 'Request timed out' ? 'Server timed out. Try again.' : 'Connection error. Try again.';
   });
 }
 
 function showDashboard(orders) {
   $('gate').style.display = 'none';
-  $('dashboard').style.display = 'block';
-  $('logoutBtn').style.display = '';
+  $('dashboard').style.display = 'block';$('logoutBtn').style.display = '';
   allOrders = orders;
+
+  $('roleBadge').textContent = isAdmin ? 'Admin' : 'Owner';
 
   if (isAdmin) {
     $('siteControl').style.display = 'flex';
     loadSiteStatus();
     setupToggle();
+  } else {
+    $('siteControl').style.display = 'none';
   }
 
   applyFilters();
@@ -271,7 +302,7 @@ function updateToggleUI() {
 }
 
 function setupToggle() {
-  $('siteToggle').addEventListener('change', function() {
+  $('siteToggle').onchange = function() {
     if (toggleBusy) { $('siteToggle').checked = siteOpen; return; }
     const newOpen = $('siteToggle').checked;
     if (!confirm(newOpen ? 'Open the site to orders?' : 'Close the site? Customers will see a "closed" message.')) {
@@ -288,18 +319,31 @@ function setupToggle() {
       $('siteToggle').checked = siteOpen;
       $('scDesc').textContent = 'Connection error.';
     });
-  });
+  };
 }
 
-// Orders
+// Orders filtering with specific target property matching
 function applyFilters() {
   const q = $('searchBox').value.trim().toLowerCase();
   const st = $('filterStatus').value;
+  
   filtered = allOrders.filter(function(o) {
     const matchSt = !st || o['Status'] === st || (!o['Status'] && st === 'New');
-    const matchQ = !q || JSON.stringify(o).toLowerCase().includes(q);
+    
+    // Target only specific values rather than JSON stringification
+    const targetValues = [
+      o['Order ID'], 
+      o['Name'], 
+      o['Contact'], 
+      o['Item Type'], 
+      o['Owner Note']
+    ];
+    
+    const matchQ = !q || targetValues.some(val => String(val || '').toLowerCase().includes(q));
+    
     return matchSt && matchQ;
   });
+  
   currentPage = 1;
   render();
 }
@@ -399,18 +443,14 @@ function renderPager(pages) {
   });
 }
 
-$('searchBox').addEventListener('input', applyFilters);
-$('filterStatus').addEventListener('change', applyFilters);
+$('searchBox').addEventListener('input', applyFilters);$('filterStatus').addEventListener('change', applyFilters);
 
 $('logoutBtn').addEventListener('click', function() {
   sessionStorage.removeItem('adminPc');
   sessionStorage.removeItem('adminRole');
   savedPasscode = ''; isAdmin = false;
-  $('dashboard').style.display = 'none';
-  $('gate').style.display = '';
-  $('logoutBtn').style.display = 'none';
-  $('ownerPc').value = ''; $('adminPc').value = '';
-  $('gateErr').textContent = '';
+  $('dashboard').style.display = 'none';$('gate').style.display = '';
+  $('logoutBtn').style.display = 'none';$('ownerPc').value = ''; $('adminPc').value = '';$('gateErr').textContent = '';
 });
 
 // Session restore
@@ -418,7 +458,8 @@ $('logoutBtn').addEventListener('click', function() {
   const pc = sessionStorage.getItem('adminPc');
   const role = sessionStorage.getItem('adminRole');
   if (!pc) return;
-  savedPasscode = pc; isAdmin = role === '1';
+  savedPasscode = pc; 
+  isAdmin = role === '1';
   callApi('getOrders', { passcode: pc }).then(function(res) {
     if (res.status === 'ok') showDashboard(res.orders || []);
   }).catch(function() {});
