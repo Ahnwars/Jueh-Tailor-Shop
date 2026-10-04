@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Check Your Order — Jueh Tailoring</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--sky:#0B1345;--horizon:#E89A4C;--horizon-deep:#C15A3A;--canvas:#F7F4EC;--panel:#FFF;--ink:#101418;--soft:#4B5563;--hair:#DDD6C4;--focus:#2F6FED;--ok:#1B7A43;--err:#B3261E;--badge-new:#2F6FED;--badge-ongoing:#C15A3A;--badge-done:#1B7A43;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--canvas);color:var(--ink);font-family:'Inter',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;animation:pgIn .45s ease both;}
+@keyframes pgIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+body.out{animation:pgOut .35s ease forwards;}
+@keyframes pgOut{to{opacity:0;transform:translateY(-14px)}}
+h1,h2{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.01em;line-height:1.05;}
+a{color:inherit;}
+.wrap{max-width:560px;margin:0 auto;padding:0 24px;}
+
+/* Header */
+header{background:var(--sky);color:#F2EFE6;border-bottom:3px solid var(--horizon);padding:16px 24px;}
+header .inner{max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
+header h1{font-size:18px;}
+header a.back{font-size:13px;color:#D9DEE8;text-decoration:none;transition:color .2s;}
+header a.back:hover{color:#fff;}
+
+main{padding:60px 0 80px;}
+
+/* Panel */
+.panel{background:var(--panel);border:1px solid var(--hair);border-radius:10px;padding:32px;}
+.panel h2{font-size:22px;margin-bottom:8px;text-align:center;}
+.panel .sub{color:var(--soft);font-size:14px;margin-bottom:24px;text-align:center;}
+
+/* Fields */
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--soft);margin-bottom:6px;}
+.field input{width:100%;padding:11px 14px;font-size:15px;border:1.5px solid var(--hair);border-radius:5px;font-family:inherit;background:var(--canvas);transition:border-color .2s;}
+.field input:focus-visible{outline:none;border-color:var(--focus);box-shadow:0 0 0 3px rgba(47,111,237,.15);}
+
+/* Button */
+button.check{width:100%;padding:13px;margin-top:6px;background:linear-gradient(90deg,var(--horizon-deep),var(--horizon));color:#1A1206;border:none;border-radius:5px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;transition:opacity .2s,transform .15s;}
+button.check:hover{opacity:.9;transform:translateY(-1px);}
+button.check:disabled{opacity:.6;cursor:default;transform:none;}
+.err-msg{color:var(--err);font-size:13px;margin-top:12px;text-align:center;min-height:16px;}
+
+/* Result */
+.result{margin-top:28px;padding-top:24px;border-top:1px solid var(--hair);display:none;animation:fadeUp .35s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.badge{display:inline-block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:4px 12px;border-radius:20px;color:#fff;margin-bottom:14px;}
+.badge.new{background:var(--badge-new);}
+.badge.ongoing{background:var(--badge-ongoing);}
+.badge.done{background:var(--badge-done);}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px 20px;font-size:14px;margin-bottom:16px;}
+.grid .lbl{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--soft);margin-bottom:2px;}
+
+.note-box{background:#F1F0E9;border-radius:6px;padding:14px 16px;font-size:14px;white-space:pre-wrap;margin-bottom:16px;}
+.note-box .lbl{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--soft);margin-bottom:4px;}
+
+/* Result actions */
+.result-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;}
+.btn-copy,.btn-new{padding:9px 16px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:opacity .2s,transform .15s;}
+.btn-copy{background:var(--sky);color:#F2EFE6;}
+.btn-new{background:transparent;color:var(--horizon-deep);border:1.5px solid var(--horizon-deep);text-decoration:none;display:inline-flex;align-items:center;}
+.btn-copy:hover,.btn-new:hover{opacity:.85;transform:translateY(-1px);}
+.btn-copy.copied{background:var(--ok);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <h1>Jueh Tailoring</h1>
+    <a class="back" href="index.html">← Back to site</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="panel">
+      <h2>Check Your Order</h2>
+      <p class="sub">Enter the Order ID you received, along with the phone or email you used.</p>
+
+      <div class="field">
+        <label for="orderId">Order ID</label>
+        <input type="text" id="orderId" placeholder="e.g. JT-260926-1234" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="field">
+        <label for="contact">Phone or email used at order</label>
+        <input type="text" id="contact" autocomplete="off">
+      </div>
+      <button class="check" id="checkBtn">Check Status</button>
+      <div class="err-msg" id="errMsg"></div>
+
+      <div class="result" id="result">
+        <div id="badgeWrap"></div>
+        <div class="grid" id="detailGrid"></div>
+        <div class="note-box" id="noteWrap" style="display:none;">
+          <span class="lbl">Note from Jueh Tailoring</span>
+          <div id="noteText"></div>
+        </div>
+        <div class="result-actions">
+          <button class="btn-copy" id="copyBtn">Copy Order ID</button>
+          <a class="btn-new" href="index.html">+ Place Another Order</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const SHEETS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyHen3-Ifrt8D_D91V0TgE4zzPrpStrf-LzvUvIg6Jm0mO6fW89iDEGJ9K8tV53Lved/exec';
+
+const $ = id => document.getElementById(id);
+const orderIdInput = $('orderId'), contactInput = $('contact');
+const checkBtn = $('checkBtn'), errMsg = $('errMsg');
+const result = $('result'), badgeWrap = $('badgeWrap');
+const detailGrid = $('detailGrid'), noteWrap = $('noteWrap'), noteText = $('noteText');
+const copyBtn = $('copyBtn');
+
+let lastOrderId = '';
+
+function callApi(action, params) {
+  return new Promise(function(resolve, reject) {
+    var cb = 'jsonp_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    var qs = Object.assign({ action: action, callback: cb }, params || {});
+    var url = SHEETS_WEBAPP_URL + '?' + Object.keys(qs).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(qs[k])).join('&');
+    window[cb] = function(data) {
+      delete window[cb];
+      sc.parentNode && sc.parentNode.removeChild(sc);
+      resolve(data);
+    };
+    var sc = document.createElement('script');
+    sc.src = url;
+    sc.onerror = function() { delete window[cb]; sc.parentNode && sc.parentNode.removeChild(sc); reject(new Error('failed')); };
+    document.body.appendChild(sc);
+  });
+}
+
+function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtDate(v) {
+  if (!v) return '—';
+  const d = new Date(v);
+  if (isNaN(d)) return esc(v);
+  return d.toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' });
+}
+function cell(lbl, val) { return '<div><span class="lbl">' + esc(lbl) + '</span>' + esc(val || '—') + '</div>'; }
+
+checkBtn.addEventListener('click', function() {
+  const orderId = orderIdInput.value.trim();
+  const contact = contactInput.value.trim();
+  errMsg.textContent = '';
+  result.style.display = 'none';
+  if (!orderId || !contact) { errMsg.textContent = 'Please enter both fields.'; return; }
+
+  checkBtn.disabled = true;
+  checkBtn.textContent = 'Checking…';
+
+  callApi('lookupOrder', { orderId, contact }).then(function(res) {
+    checkBtn.disabled = false;
+    checkBtn.textContent = 'Check Status';
+    if (res.status !== 'ok') { errMsg.textContent = res.message || 'Order not found.'; return; }
+    const o = res.order;
+    lastOrderId = orderId;
+    const st = o['Status'] || 'New';
+    const cls = st === 'Ongoing' ? 'ongoing' : st === 'Done' ? 'done' : 'new';
+    badgeWrap.innerHTML = '<span class="badge ' + cls + '">' + esc(st) + '</span>';
+    detailGrid.innerHTML = cell('Item', o['Item Type']) + cell('Quantity', o['Quantity']) + cell('Ordered on', fmtDate(o['Timestamp'])) + cell('Needed by', o['Needed By']);
+    if (o['Owner Note']) {
+      noteWrap.style.display = 'block';
+      noteText.textContent = o['Owner Note'];
+    } else {
+      noteWrap.style.display = 'none';
+    }
+    copyBtn.textContent = 'Copy Order ID';
+    copyBtn.classList.remove('copied');
+    result.style.display = 'block';
+  }).catch(function() {
+    checkBtn.disabled = false;
+    checkBtn.textContent = 'Check Status';
+    errMsg.textContent = 'Could not reach the order system. Check your connection and try again.';
+  });
+});
+
+copyBtn.addEventListener('click', function() {
+  if (!lastOrderId) return;
+  navigator.clipboard.writeText(lastOrderId).then(function() {
+    copyBtn.textContent = '✓ Copied!';
+    copyBtn.classList.add('copied');
+    setTimeout(function() { copyBtn.textContent = 'Copy Order ID'; copyBtn.classList.remove('copied'); }, 2000);
+  }).catch(function() {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = lastOrderId;
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    copyBtn.textContent = '✓ Copied!';
+    copyBtn.classList.add('copied');
+    setTimeout(function() { copyBtn.textContent = 'Copy Order ID'; copyBtn.classList.remove('copied'); }, 2000);
+  });
+});
+
+// Page-exit animation on nav
+document.querySelectorAll('a[href]').forEach(function(a) {
+  const href = a.getAttribute('href');
+  if (!href || href.startsWith('#') || href.startsWith('http')) return;
+  a.addEventListener('click', function(e) {
+    e.preventDefault();
+    document.body.classList.add('out');
+    setTimeout(function() { location.href = href; }, 350);
+  });
+});
+
+orderIdInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkBtn.click(); });
+contactInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkBtn.click(); });
+
+// Auto-fill + auto-check from URL params
+(function() {
+  const p = new URLSearchParams(location.search);
+  const pid = p.get('orderId'), pc = p.get('contact');
+  if (pid) orderIdInput.value = pid;
+  if (pc) contactInput.value = pc;
+  if (pid && pc) setTimeout(function() { checkBtn.click(); }, 300);
+})();
+</script>
+</body>
+</html>
