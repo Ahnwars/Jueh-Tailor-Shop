@@ -15,443 +15,315 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root{--navy:#0B1345;--navy-mid:#14236E;--navy-deep:#081029;--amber:#E89A4C;--rust:#C15A3A;--cream:#F7F4EC;--ink:#101418;--ink-soft:#4B5563;--line:#DDD6C4;--focus:#2F6FED;--ok:#1B7A43;--err:#B3261E;--bg:var(--cream);--bgp:#fff;--txt:var(--ink);--txts:var(--ink-soft);box-sizing:border-box}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:var(--navy-deep);--bgp:#10204A;--txt:#F2EFE6;--txts:#B9C2D4;--line:#24406B}}
-:root[data-theme=dark]{--bg:var(--navy-deep);--bgp:#10204A;--txt:#F2EFE6;--txts:#B9C2D4;--line:#24406B}
-*,*::before,*::after{box-sizing:inherit}
-html{scroll-behavior:smooth;scroll-padding-top:66px}
-body{margin:0;background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;animation:pgIn .45s ease both}
-@keyframes pgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-body.out{animation:pgOut .35s ease forwards!important}
-@keyframes pgOut{to{opacity:0;transform:translateY(-14px)}}
-h1,h2,h3{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.01em;line-height:1.05;margin:0}
-a{color:inherit;text-decoration:none}
-img,svg{max-width:100%;display:block}
-.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
-
-/* reveal */
-.r{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
-.r.on{opacity:1;transform:translateY(0)}
-.r.d1{transition-delay:.1s}.r.d2{transition-delay:.2s}.r.d3{transition-delay:.3s}
-
-/* consent modal */
-#consentOverlay{position:fixed;inset:0;background:rgba(8,16,41,.72);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:opacity .3s ease;}
-#consentOverlay.show{opacity:1;visibility:visible;}
-.consent-box{background:var(--bgp);border:1px solid var(--line);border-radius:12px;max-width:480px;width:100%;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.35);transform:translateY(16px);transition:transform .3s ease;max-height:86vh;overflow-y:auto;}
-#consentOverlay.show .consent-box{transform:translateY(0);}
-.consent-box h2{font-size:19px;margin-bottom:10px;color:var(--txt);}
-.consent-box p{font-size:14px;line-height:1.65;color:var(--txts);margin-bottom:14px;}
-.consent-box a{color:var(--rust);font-weight:600;text-decoration:underline;}
-.consent-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
-.consent-actions button{flex:1;min-width:130px;padding:12px 16px;border-radius:6px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;border:none;transition:opacity .2s,transform .15s;}
-.consent-actions button:hover{transform:translateY(-1px);}
-#consentAgree{background:linear-gradient(90deg,var(--rust),var(--amber));color:#1A1206;}
-#consentDecline{background:transparent;color:var(--txts);border:1.5px solid var(--line)!important;}
-.consent-checks{display:flex;align-items:flex-start;gap:8px;margin:14px 0;font-size:13px;color:var(--txts);}
-.consent-checks input{margin-top:3px;accent-color:var(--rust);cursor:pointer;}
-.consent-checks label{cursor:pointer;}
-
-/* header */
-header{position:sticky;top:0;z-index:100;background:var(--navy);color:#F2EFE6;border-bottom:3px solid var(--amber);transition:box-shadow .3s}
-header.sd{box-shadow:0 4px 28px rgba(0,0,0,.45)}
-.nav{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;max-width:1120px;margin:0 auto;gap:16px}
-.brand{display:flex;align-items:center;gap:10px;color:#F2EFE6}
-.bicon{width:36px;height:36px;border-radius:6px;background:linear-gradient(135deg,var(--rust),var(--amber));display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;color:#fff;flex-shrink:0}
-.bname{font-family:'Oswald',sans-serif;font-size:16px;letter-spacing:.04em}
-.bsub{font-size:10px;color:#7A8FA8;letter-spacing:.05em}
-.navl{display:flex;gap:24px;list-style:none;margin:0;padding:0}
-.navl a{font-size:13px;font-weight:500;color:#C9D1E0;transition:color .15s}
-.navl a:hover{color:#fff}
-.navr{display:flex;align-items:center;gap:9px}
-.btn-cta{background:linear-gradient(90deg,var(--rust),var(--amber));color:#1A1206;padding:9px 17px;border-radius:4px;font-size:13px;font-weight:700;font-family:inherit;border:none;cursor:pointer;box-shadow:0 2px 10px rgba(232,154,76,.3);transition:transform .15s,box-shadow .15s}
-.btn-cta:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(232,154,76,.5)}
-.btn-ghost{background:transparent;border:1.5px solid rgba(242,239,230,.28);color:#F2EFE6;padding:8px 15px;border-radius:4px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:border-color .2s,background .2s}
-.btn-ghost:hover{border-color:rgba(242,239,230,.6);background:rgba(255,255,255,.06)}
-.tbtn{background:none;border:1px solid rgba(255,255,255,.18);border-radius:4px;color:#C9D1E0;width:32px;height:32px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:background .2s}
-.tbtn:hover{background:rgba(255,255,255,.1);color:#fff}
-.mbtn{display:none;background:none;border:1px solid rgba(255,255,255,.2);border-radius:4px;color:#F2EFE6;width:36px;height:34px;font-size:17px;cursor:pointer;align-items:center;justify-content:center}
-@media(max-width:768px){
-  .navl{display:none}.mbtn{display:flex}
-  .nav-cta-wrap{display:none}
-  header.op .navl{display:flex;flex-direction:column;align-items:flex-start;position:absolute;top:100%;left:0;right:0;background:var(--navy);padding:20px 24px 26px;gap:15px;border-bottom:3px solid var(--amber);animation:sd .22s ease}
-  @keyframes sd{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-  header.op .navl a{font-size:15px;color:#F2EFE6}
-}
-
-/* hero */
-.hero{position:relative;overflow:hidden;background:linear-gradient(155deg,var(--navy) 0%,var(--navy-mid) 50%,var(--rust) 88%,var(--amber) 100%);color:#F2EFE6;padding:110px 0 90px;min-height:88vh;display:flex;align-items:center}
-.hstars{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(1.5px 1.5px at 11% 14%,rgba(255,255,255,.8),transparent),radial-gradient(1px 1px at 27% 7%,rgba(255,255,255,.5),transparent),radial-gradient(1.5px 1.5px at 44% 21%,rgba(255,255,255,.6),transparent),radial-gradient(1px 1px at 61% 9%,rgba(255,255,255,.5),transparent),radial-gradient(1.5px 1.5px at 77% 25%,rgba(255,255,255,.7),transparent),radial-gradient(1.5px 1.5px at 90% 12%,rgba(255,255,255,.4),transparent),radial-gradient(1px 1px at 5% 33%,rgba(255,255,255,.45),transparent),radial-gradient(1px 1px at 93% 30%,rgba(255,255,255,.5),transparent)}
-.hmesh{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0,rgba(255,255,255,.012) 1px,transparent 1px,transparent 64px),repeating-linear-gradient(90deg,rgba(255,255,255,.012) 0,rgba(255,255,255,.012) 1px,transparent 1px,transparent 64px)}
-.hi{position:relative;z-index:2;width:100%;max-width:1120px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
-.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;animation:fu .5s .1s ease both}
-.eyebrow::before{content:'';width:20px;height:2px;background:currentColor}
-.eyebrow-a{color:var(--amber)}.eyebrow-r{color:var(--rust)}
-.hero h1{font-size:clamp(44px,6vw,72px);color:#fff;margin-bottom:18px;animation:fu .5s .2s ease both}
-.hero h1 em{color:var(--amber);font-style:normal}
-.hero p{font-size:16px;color:#B9C2D4;line-height:1.65;margin-bottom:34px;animation:fu .5s .3s ease both;max-width:440px}
-.hacts{display:flex;gap:11px;flex-wrap:wrap;animation:fu .5s .4s ease both}
-.btn-hp{background:linear-gradient(90deg,var(--rust),var(--amber));color:#1A1206;padding:13px 28px;border-radius:5px;font-size:15px;font-weight:700;font-family:inherit;border:none;cursor:pointer;box-shadow:0 3px 16px rgba(232,154,76,.4);transition:transform .15s,box-shadow .15s}
-.btn-hp:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(232,154,76,.55)}
-.btn-hs{background:rgba(255,255,255,.08);color:#F2EFE6;padding:12px 22px;border-radius:5px;font-size:15px;font-weight:600;font-family:inherit;border:1.5px solid rgba(255,255,255,.24);cursor:pointer;transition:background .2s,border-color .2s}
-.btn-hs:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.5)}
-.hcards{animation:fu .7s .25s ease both;display:flex;flex-direction:column;gap:11px}
-.hcard{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:17px 19px;backdrop-filter:blur(10px);display:flex;align-items:center;gap:13px;transition:transform .25s,background .25s}
-.hcard:hover{background:rgba(255,255,255,.1);transform:translateX(4px)}
-.hcardicon{width:42px;height:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
-.hcard strong{display:block;font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.02em;color:#fff}
-.hcard span{font-size:12px;color:#8899B4}
-.pill{margin-left:auto;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
-.pill-g{background:rgba(74,222,128,.12);color:#4ADE80}
-.pill-a{background:rgba(232,154,76,.15);color:var(--amber)}
-@keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:768px){.hero{min-height:auto;padding:80px 0 60px}.hi{grid-template-columns:1fr;gap:0}.hcards{display:none}}
-
-/* section base */
-section{padding:80px 0}
-.stitle{font-size:clamp(28px,4vw,42px);color:var(--txt);margin-bottom:12px}
-.stitle-l{font-size:clamp(28px,4vw,42px);color:#fff;margin-bottom:12px}
-.ssub{font-size:15px;line-height:1.65;max-width:500px}
-.ssub-s{color:var(--txts)}.ssub-l{color:#8899B4}
-
-/* process */
-.proc{background:var(--navy)}
-.srow{display:grid;grid-template-columns:repeat(3,1fr);margin-top:50px;position:relative}
-.srow::after{content:'';position:absolute;top:44px;left:calc(50%/3 + 28px);right:calc(50%/3 + 28px);height:1px;background:linear-gradient(90deg,rgba(232,154,76,.4),rgba(232,154,76,.1) 45%,rgba(232,154,76,.1) 55%,rgba(232,154,76,.4))}
-.step{text-align:center;padding:38px 22px 34px}
-.scirc{width:54px;height:54px;border-radius:50%;border:1.5px solid rgba(232,154,76,.3);background:rgba(232,154,76,.08);display:inline-flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-size:22px;color:var(--amber);margin-bottom:18px;transition:background .3s,border-color .3s}
-.step:hover .scirc{background:rgba(232,154,76,.18);border-color:rgba(232,154,76,.6)}
-.step h3{font-size:15px;letter-spacing:.05em;color:#fff;margin-bottom:9px}
-.step p{font-size:13px;color:#7A8FA8;line-height:1.65;margin:0}
-@media(max-width:600px){.srow{grid-template-columns:1fr}.srow::after{display:none}}
-
-/* services */
-.srv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:50px}
-.scard{background:var(--bgp);border:1px solid var(--line);border-radius:12px;padding:30px 26px;position:relative;overflow:hidden;transition:transform .25s,box-shadow .25s,border-color .25s}
-.scard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--rust),var(--amber));transform:scaleX(0);transform-origin:left;transition:transform .3s}
-.scard:hover{transform:translateY(-4px);box-shadow:0 14px 44px rgba(0,0,0,.1);border-color:rgba(232,154,76,.25)}
-.scard:hover::before{transform:scaleX(1)}
-.sicon{font-size:36px;margin-bottom:16px}
-.scard h3{font-size:17px;color:var(--txt);margin-bottom:9px}
-.scard p{font-size:14px;color:var(--txts);line-height:1.65;margin:0}
-@media(max-width:768px){.srv-grid{grid-template-columns:1fr}}
-@media(min-width:520px) and (max-width:768px){.srv-grid{grid-template-columns:repeat(2,1fr)}}
-
-/* stats */
-.stats-sec{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%);padding:70px 0}
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;text-align:center}
-.stat-n{font-family:'Oswald',sans-serif;font-size:clamp(40px,5vw,60px);color:var(--amber);line-height:1;margin-bottom:8px}
-.stat-l{font-size:12px;color:#7A8FA8;text-transform:uppercase;letter-spacing:.08em}
-@media(max-width:600px){.stats-row{grid-template-columns:repeat(2,1fr);gap:24px}}
-
-/* closed banner */
-.cbanner{display:none;background:linear-gradient(90deg,#7C1A16,var(--err));color:#fff;text-align:center;padding:14px 24px;font-size:14px;font-weight:600}
-.cbanner.on{display:block;animation:fu .4s ease}
-.cbanner a{color:#fff;text-decoration:underline}
-
-/* order form */
-.oform-wrap{max-width:700px;margin:0 auto}
-.form-body{margin-top:32px}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px}
-.frow.one{grid-template-columns:1fr}
-.fld{display:flex;flex-direction:column;gap:5px}
-.fld label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--txts)}
-.req{color:var(--rust)}
-.fld input,.fld select,.fld textarea{width:100%;padding:11px 13px;font-size:15px;font-family:inherit;border:1.5px solid var(--line);border-radius:6px;background:var(--bgp);color:var(--txt);transition:border-color .2s,box-shadow .2s;appearance:none}
-.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(232,154,76,.15)}
-.fld input.er,.fld select.er,.fld textarea.er{border-color:var(--err);box-shadow:0 0 0 3px rgba(179,38,30,.1)}
-.fld .hint{font-size:12px;color:var(--err);min-height:14px}
-.fld textarea{resize:vertical;min-height:86px}
-.fnotice{background:var(--bgp);border:1px solid var(--line);border-radius:8px;padding:14px 17px;font-size:13px;color:var(--txts);margin-bottom:14px;display:flex;gap:9px;align-items:flex-start;line-height:1.55}
-.fstatus{margin-top:16px;padding:13px 17px;border-radius:8px;font-size:14px;font-weight:500;display:none;animation:fu .3s ease}
-.fstatus.on{display:block}
-.fstatus.ok{background:#E4F3E9;color:var(--ok);border:1px solid #A8D5B5}
-.fstatus.er{background:#FBE8E7;color:var(--err);border:1px solid #F5B8B5}
-.subrow{display:flex;align-items:center;gap:13px;margin-top:20px;flex-wrap:wrap}
-.btn-sub{background:linear-gradient(90deg,var(--rust),var(--amber));color:#1A1206;padding:13px 30px;border-radius:6px;font-size:15px;font-weight:700;font-family:inherit;border:none;cursor:pointer;box-shadow:0 2px 12px rgba(232,154,76,.35);transition:transform .15s,box-shadow .15s}
-.btn-sub:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(232,154,76,.5)}
-.btn-sub:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
-@media(max-width:600px){.frow{grid-template-columns:1fr}}
-
-/* faq */
-.faq-sec{background:var(--bgp)}
-.faq-list{max-width:680px;margin:46px auto 0}
-.fi{border-bottom:1px solid var(--line)}
-.fi:first-child{border-top:1px solid var(--line)}
-.fq{width:100%;background:none;border:none;cursor:pointer;text-align:left;padding:19px 0;font-family:'Oswald',sans-serif;font-size:15px;font-weight:500;text-transform:uppercase;letter-spacing:.03em;color:var(--txt);display:flex;justify-content:space-between;align-items:center;gap:13px;transition:color .2s}
-.fq:hover{color:var(--rust)}
-.ficon{width:21px;height:21px;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:var(--txts);transition:transform .3s,border-color .3s,background .3s,color .3s}
-.fi.op .ficon{transform:rotate(45deg);border-color:var(--rust);background:var(--rust);color:#fff}
-.fa{overflow:hidden;max-height:0;transition:max-height .35s ease,padding .35s ease;font-size:14px;color:var(--txts);line-height:1.7}
-.fi.op .fa{max-height:260px;padding-bottom:18px}
-
-/* footer */
-footer{background:var(--navy-deep);color:#7A8FA8;padding:58px 0 30px}
-.ftop{display:grid;grid-template-columns:2fr 1fr 1fr;gap:38px;padding-bottom:42px;border-bottom:1px solid rgba(255,255,255,.07)}
-.fbrand p{font-size:13px;line-height:1.7;margin:10px 0 16px;max-width:270px}
-.fcontact a{display:flex;align-items:center;gap:7px;font-size:13px;color:#7A8FA8;margin-bottom:8px;transition:color .2s}
-.fcontact a:hover{color:var(--amber)}
-.fcol h4{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.1em;color:#fff;margin:0 0 14px}
-.fcol ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
-.fcol ul a{font-size:13px;color:#7A8FA8;transition:color .2s}
-.fcol ul a:hover{color:var(--amber)}
-.fbot{display:flex;justify-content:space-between;align-items:center;padding-top:24px;font-size:12px;flex-wrap:wrap;gap:10px}
-.fbot a{color:var(--amber)}
-@media(max-width:768px){.ftop{grid-template-columns:1fr;gap:26px}}
-</style>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/home.css">
 </head>
 <body>
 
-<div id="consentOverlay">
+<div class="consent" id="consent">
   <div class="consent-box">
-    <h2>Before you continue</h2>
-    <p>Jueh Tailoring collects your name, contact info, and order details to process your custom order, in line with our <a href="policy.html" target="_blank" rel="noopener">Privacy Policy &amp; Terms of Service</a>. Orders are a contract for a piece of work under Philippine law — once production starts, deposits are non-refundable.</p>
-    <div class="consent-checks">
-      <input type="checkbox" id="consentCheck">
-      <label for="consentCheck">I have read and agree to the Privacy Policy and Terms of Service.</label>
-    </div>
-    <div class="consent-actions">
-      <button id="consentDecline" type="button">Leave Site</button>
-      <button id="consentAgree" type="button" disabled>Agree &amp; Continue</button>
-    </div>
+    <h2>Before you continue 👋</h2>
+    <p>Jueh Tailoring needs your basic info (name, contact, order details) to process your order. Here's what you should know:</p>
+    <ul class="consent-list">
+      <li>🔒 Your info is only used for your order — never sold or shared.</li>
+      <li>💰 Deposits are <strong>non-refundable</strong> once we start making your item.</li>
+      <li>📞 We'll contact you to confirm details before starting.</li>
+      <li>📄 Full details: <a href="policy.html" target="_blank" rel="noopener">Privacy Policy &amp; Terms of Service</a></li>
+    </ul>
+    <label class="consent-check">
+      <input type="checkbox" id="consent-checkbox">
+      I have read and agree to the terms above.
+    </label>
+    <button class="btn btn-primary btn-block" id="consent-agree" type="button" disabled>Agree &amp; Continue</button>
+    <button class="consent-leave" id="consent-leave" type="button">Leave Site</button>
   </div>
 </div>
 
-<header id="hdr">
-  <nav class="nav">
+<header class="site-header" id="site-header">
+  <div class="header-inner">
     <a href="#" class="brand" aria-label="Jueh Tailoring">
-      <div class="bicon" aria-hidden="true">JT</div>
-      <div><div class="bname">Jueh Tailoring</div><div class="bsub">Manolo Fortich, Bukidnon</div></div>
+      <span class="brand-mark" aria-hidden="true">JT</span>
+      <span>
+        <span class="brand-name">Jueh Tailoring</span>
+        <span class="brand-place">Manolo Fortich, Bukidnon</span>
+      </span>
     </a>
-    <ul class="navl" id="navl">
+    <ul class="nav-links">
       <li><a href="#process">How It Works</a></li>
       <li><a href="#services">Services</a></li>
       <li><a href="#order">Order</a></li>
       <li><a href="#faq">FAQ</a></li>
     </ul>
-    <div class="navr">
-      <span class="nav-cta-wrap"><a href="lookup.html" class="btn-ghost">Track Order</a></span>
-      <span class="nav-cta-wrap"><a href="#order" class="btn-cta">Order Now</a></span>
-      <button class="tbtn" id="tbtn" aria-label="Toggle theme">☀</button>
-      <button class="mbtn" id="mbtn" aria-label="Menu" aria-expanded="false">☰</button>
+    <div class="header-actions">
+      <a href="lookup.html" class="btn btn-outline btn-small">Track Order</a>
+      <a href="#order" class="btn btn-primary btn-small">Order Now</a>
+      <button class="icon-btn" id="theme-btn" aria-label="Toggle dark mode">☀</button>
+      <button class="icon-btn menu-btn" id="menu-btn" aria-label="Menu" aria-expanded="false">☰</button>
     </div>
-  </nav>
+  </div>
 </header>
 
-<section class="hero" aria-labelledby="h1">
-  <div class="hstars" aria-hidden="true"></div>
-  <div class="hmesh" aria-hidden="true"></div>
-  <div class="hi">
-    <div>
-      <div class="eyebrow eyebrow-a">Custom Apparel, Made Right</div>
-      <h1 id="h1">Gear Built for <em>Champions</em></h1>
-      <p>Premium custom jerseys, uniforms, and apparel — ordered online, crafted by hand, tracked in real time. Based in Manolo Fortich, Bukidnon.</p>
-      <div class="hacts">
-        <button class="btn-hp" onclick="document.getElementById('order').scrollIntoView({behavior:'smooth'})">Place an Order</button>
-        <a href="lookup.html" class="btn-hs">Track My Order</a>
+<section class="hero">
+  <div class="container">
+    <p class="eyebrow">Custom Apparel, Made Right</p>
+    <h1>Gear Built for <span>Champions</span></h1>
+    <p>Premium custom jerseys, uniforms, and apparel — ordered online, crafted by hand, tracked in real time. Based in Manolo Fortich, Bukidnon.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="document.getElementById('order').scrollIntoView({behavior:'smooth'})">Place an Order</button>
+      <a href="lookup.html" class="btn btn-outline">Track My Order</a>
+    </div>
+  </div>
+</section>
+
+<section class="process" id="process">
+  <div class="container">
+    <div class="reveal">
+      <p class="eyebrow">The Process</p>
+      <h2 class="section-title">How It Works</h2>
+      <p class="section-intro">Three simple steps from idea to delivery.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <span class="step-number">1</span>
+        <h3>Fill the Form</h3>
+        <p>Tell us what you need — item, sizes, quantity, design details, and budget.</p>
+      </div>
+      <div class="step reveal">
+        <span class="step-number">2</span>
+        <h3>We Craft It</h3>
+        <p>Our team reviews your order and gets to work. Track progress anytime with your Order ID.</p>
+      </div>
+      <div class="step reveal">
+        <span class="step-number">3</span>
+        <h3>Pick Up or Deliver</h3>
+        <p>We notify you when ready. Quality guaranteed on every piece.</p>
       </div>
     </div>
-    <div class="hcards" aria-hidden="true">
-      <div class="hcard"><div class="hcardicon" style="background:rgba(232,154,76,.14)">🏆</div><div><strong>Sports Jerseys</strong><span>Basketball, volleyball, football & more</span></div><span class="pill pill-g">Popular</span></div>
-      <div class="hcard"><div class="hcardicon" style="background:rgba(47,111,237,.14)">👕</div><div><strong>Team Uniforms</strong><span>Sublimation & embroidery available</span></div><span class="pill pill-a">Custom</span></div>
-      <div class="hcard"><div class="hcardicon" style="background:rgba(27,122,67,.14)">📦</div><div><strong>Bulk Orders</strong><span>Volume pricing, fast turnaround</span></div><span class="pill pill-g">Open</span></div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="container">
+    <div class="reveal">
+      <p class="eyebrow">What We Make</p>
+      <h2 class="section-title">Our Services</h2>
+      <p class="section-intro">Every piece is cut and sewn to your exact specs.</p>
+    </div>
+    <div class="service-grid">
+      <div class="service reveal">
+        <h3>🏅 Sports Jerseys</h3>
+        <p>Basketball, volleyball, football, badminton and more. Full sublimation with team colors, numbers, and names.</p>
+      </div>
+      <div class="service reveal">
+        <h3>👔 Team Uniforms</h3>
+        <p>School, corporate, and club uniforms. Bulk orders with consistent sizing and premium fabric options.</p>
+      </div>
+      <div class="service reveal">
+        <h3>✂️ Custom Apparel</h3>
+        <p>T-shirts, hoodies, polo shirts, and specialty items. Bring your design or we'll create one together.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="proc" id="process">
-  <div class="wrap">
-    <div class="r"><div class="eyebrow eyebrow-a">The Process</div><h2 class="stitle-l">How It Works</h2><p class="ssub ssub-l">Three simple steps from idea to delivery.</p></div>
-    <div class="srow">
-      <div class="step r d1"><div class="scirc">1</div><h3>Fill the Form</h3><p>Tell us what you need — item, sizes, quantity, design details, and budget.</p></div>
-      <div class="step r d2"><div class="scirc">2</div><h3>We Craft It</h3><p>Our team reviews your order and gets to work. Track progress anytime with your Order ID.</p></div>
-      <div class="step r d3"><div class="scirc">3</div><h3>Pick Up or Deliver</h3><p>We notify you when ready. Quality guaranteed on every piece.</p></div>
+<section class="process" aria-label="Business statistics">
+  <div class="container">
+    <div class="steps" style="text-align:center">
+      <div class="reveal"><span class="step-number" data-count-to="500">0</span><p>Orders Fulfilled</p></div>
+      <div class="reveal"><span class="step-number" data-count-to="200">0</span><p>Happy Customers</p></div>
+      <div class="reveal"><span class="step-number" data-count-to="3">0</span><p>Years in Business</p></div>
     </div>
   </div>
 </section>
 
-<section id="services" style="background:var(--bg);padding:80px 0">
-  <div class="wrap">
-    <div class="r"><div class="eyebrow eyebrow-r">What We Make</div><h2 class="stitle">Our Services</h2><p class="ssub ssub-s">Every piece is cut and sewn to your exact specs.</p></div>
-    <div class="srv-grid">
-      <div class="scard r d1"><div class="sicon">🏅</div><h3>Sports Jerseys</h3><p>Basketball, volleyball, football, badminton and more. Full sublimation with team colors, numbers, and names.</p></div>
-      <div class="scard r d2"><div class="sicon">👔</div><h3>Team Uniforms</h3><p>School, corporate, and club uniforms. Bulk orders with consistent sizing and premium fabric options.</p></div>
-      <div class="scard r d3"><div class="sicon">✂️</div><h3>Custom Apparel</h3><p>T-shirts, hoodies, polo shirts, and specialty items. Bring your design or we'll create one together.</p></div>
-    </div>
-  </div>
-</section>
+<section class="order-section" id="order">
+  <div class="container">
+    <div class="order-wrap">
+      <div class="reveal">
+        <p class="eyebrow">Let's Build It</p>
+        <h2 class="section-title">Place Your Order</h2>
+        <p class="section-intro">Fill in the details and we'll get started. Save your Order ID to track progress.</p>
+      </div>
 
-<section class="stats-sec" aria-label="Statistics">
-  <div class="wrap">
-    <div class="stats-row">
-      <div class="r"><div class="stat-n" data-target="500">0</div><div class="stat-l">Orders Fulfilled</div></div>
-      <div class="r d1"><div class="stat-n" data-target="200">0</div><div class="stat-l">Happy Customers</div></div>
-      <div class="r d2"><div class="stat-n" data-target="3">0</div><div class="stat-l">Years in Business</div></div>
-      <div class="r d3"><div class="stat-n" data-target="100">0</div><div class="stat-l">% Custom Made</div></div>
-    </div>
-  </div>
-</section>
+      <div class="closed-banner" id="closed-banner" role="alert">
+        🔒 We are currently not accepting new orders. Message us on
+        <a href="https://www.facebook.com/profile.php?id=100090775430928" target="_blank" rel="noopener">Facebook</a>.
+      </div>
 
-<div class="cbanner" id="cbanner" role="alert">🔒 We are currently not accepting new orders. Message us on <a href="https://www.facebook.com/profile.php?id=100090775430928" target="_blank" rel="noopener">Facebook</a>.</div>
-
-<section id="order" style="background:var(--bg);padding:80px 0">
-  <div class="wrap">
-    <div class="oform-wrap">
-      <div class="r"><div class="eyebrow eyebrow-r">Let's Build It</div><h2 class="stitle" id="order-h2">Place Your Order</h2><p class="ssub ssub-s">Fill in the details and we'll get started. Save your Order ID to track progress.</p></div>
-      <form id="orderForm" class="form-body" novalidate>
-        <div class="fnotice r"><span>ℹ️</span><span>After submitting you'll receive an <strong>Order ID</strong> — use it on the <a href="lookup.html" style="color:var(--rust);font-weight:600">tracking page</a> to check your status anytime.</span></div>
-        <div class="frow r">
-          <div class="fld"><label for="name">Full Name <span class="req">*</span></label><input type="text" id="name" name="name" autocomplete="name" placeholder="Juan dela Cruz" required><span class="hint" id="name-h"></span></div>
-          <div class="fld"><label for="contact">Phone or Email <span class="req">*</span></label><input type="text" id="contact" name="contact" autocomplete="tel" placeholder="09XX-XXX-XXXX or email" required><span class="hint" id="contact-h"></span></div>
+      <form id="order-form" novalidate>
+        <div class="form-note">
+          ℹ️ After submitting you'll receive an <strong>Order ID</strong> — use it on the
+          <a href="lookup.html">tracking page</a> to check your status anytime.
         </div>
-        <div class="frow r d1">
-          <div class="fld"><label for="itemType">Item Type <span class="req">*</span></label>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="name">Full Name <span class="required">*</span></label>
+            <input type="text" id="name" name="name" autocomplete="name" placeholder="Juan dela Cruz" required>
+            <span class="field-error" id="name-error"></span>
+          </div>
+          <div class="field">
+            <label for="contact">Phone or Email <span class="required">*</span></label>
+            <input type="text" id="contact" name="contact" autocomplete="tel" placeholder="09XX-XXX-XXXX or email" required>
+            <span class="field-error" id="contact-error"></span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="itemType">Item Type <span class="required">*</span></label>
             <select id="itemType" name="itemType" required>
               <option value="">— Select —</option>
-              <option>Basketball Jersey</option><option>Volleyball Jersey</option><option>Football Jersey</option><option>Badminton Jersey</option><option>Team Uniform</option><option>Polo Shirt</option><option>T-Shirt</option><option>Hoodie</option><option>Other / Custom</option>
-            </select><span class="hint" id="itemType-h"></span>
+              <option>Basketball Jersey</option>
+              <option>Volleyball Jersey</option>
+              <option>Football Jersey</option>
+              <option>Badminton Jersey</option>
+              <option>Team Uniform</option>
+              <option>Polo Shirt</option>
+              <option>T-Shirt</option>
+              <option>Hoodie</option>
+              <option>Other / Custom</option>
+            </select>
+            <span class="field-error" id="itemType-error"></span>
           </div>
-          <div class="fld"><label for="quantity">Quantity <span class="req">*</span></label><input type="number" id="quantity" name="quantity" min="1" placeholder="e.g. 15" required><span class="hint" id="quantity-h"></span></div>
+          <div class="field">
+            <label for="quantity">Quantity <span class="required">*</span></label>
+            <input type="number" id="quantity" name="quantity" min="1" placeholder="e.g. 15" required>
+            <span class="field-error" id="quantity-error"></span>
+          </div>
         </div>
-        <div class="frow one r d1"><div class="fld"><label for="sizes">Sizes Needed</label><input type="text" id="sizes" name="sizes" placeholder="e.g. 5×S, 8×M, 6×L, 3×XL"><span class="hint"></span></div></div>
-        <div class="frow one r d2"><div class="fld"><label for="details">Design Details</label><textarea id="details" name="details" placeholder="Colors, names, numbers, logo, reference photos, special requests..."></textarea><span class="hint"></span></div></div>
-        <div class="frow r d2">
-          <div class="fld"><label for="deadline">Needed By</label><input type="date" id="deadline" name="deadline"><span class="hint" id="deadline-h"></span></div>
-          <div class="fld"><label for="budget">Budget Range</label>
+
+        <div class="form-row single">
+          <div class="field">
+            <label for="sizes">Sizes Needed</label>
+            <input type="text" id="sizes" name="sizes" placeholder="e.g. 5×S, 8×M, 6×L, 3×XL">
+          </div>
+        </div>
+
+        <div class="form-row single">
+          <div class="field">
+            <label for="details">Design Details</label>
+            <textarea id="details" name="details" placeholder="Colors, names, numbers, logo, reference photos, special requests..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-row single">
+          <div class="field">
+            <label for="design-file">Design File <span class="label-note">(optional)</span></label>
+            <div class="file-drop" id="file-drop">
+              <input type="file" id="design-file" name="designFile" accept="image/*,.pdf,.ai,.svg" aria-describedby="file-hint">
+              <div class="file-drop-ui" id="file-drop-ui" aria-hidden="true">
+                <span class="file-drop-icon">📎</span>
+                <span class="file-drop-text">Click to attach or drag &amp; drop</span>
+                <small id="file-hint">PNG, JPG, PDF, AI, SVG — max 10 MB</small>
+              </div>
+              <div class="file-chosen hidden" id="file-chosen">
+                <span class="file-chosen-name" id="file-chosen-name"></span>
+                <button type="button" class="file-remove" id="file-remove" aria-label="Remove file">✕</button>
+              </div>
+            </div>
+            <span class="field-error" id="designFile-error"></span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="deadline">Needed By</label>
+            <input type="date" id="deadline" name="deadline">
+            <span class="field-error" id="deadline-error"></span>
+          </div>
+          <div class="field">
+            <label for="budget">Budget Range</label>
             <select id="budget" name="budget">
-              <option value="">— Optional —</option><option>Under ₱500/piece</option><option>₱500–₱1,000/piece</option><option>₱1,000–₱2,000/piece</option><option>₱2,000+/piece</option><option>To be discussed</option>
-            </select><span class="hint"></span>
+              <option value="">— Optional —</option>
+              <option>Under ₱500/piece</option>
+              <option>₱500–₱1,000/piece</option>
+              <option>₱1,000–₱2,000/piece</option>
+              <option>₱2,000+/piece</option>
+              <option>To be discussed</option>
+            </select>
           </div>
         </div>
-        <div class="subrow r d3"><button type="submit" class="btn-sub" id="subBtn">Send Order Request</button></div>
-        <div class="fstatus" id="fstatus" role="alert"></div>
+
+        <div class="submit-row">
+          <button type="submit" class="btn btn-primary" id="submit-btn">Send Order Request</button>
+        </div>
+        <div class="form-message" id="form-message" role="alert"></div>
       </form>
     </div>
   </div>
 </section>
 
-<section class="faq-sec" id="faq">
-  <div class="wrap">
-    <div class="r" style="text-align:center"><div class="eyebrow eyebrow-r" style="justify-content:center">Questions</div><h2 class="stitle">Frequently Asked</h2></div>
+<section id="faq">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <p class="eyebrow">Questions</p>
+      <h2 class="section-title">Frequently Asked</h2>
+    </div>
     <div class="faq-list">
-      <div class="fi r"><button class="fq" aria-expanded="false">How long does an order take?<span class="ficon">+</span></button><div class="fa">Rush orders take 3–5 days; standard orders 7–14 days, depending on quantity and design complexity. Please include your deadline in the form and we'll confirm if it's feasible.</div></div>
-      <div class="fi r d1"><button class="fq" aria-expanded="false">Is there a minimum order quantity?<span class="ficon">+</span></button><div class="fa">We accept orders of any size. Pricing per piece improves for bulk orders (10+ pieces). Contact us to discuss smaller quantity pricing.</div></div>
-      <div class="fi r d2"><button class="fq" aria-expanded="false">Can I send my own design?<span class="ficon">+</span></button><div class="fa">Yes! Send your design (PNG, JPG, or AI file) through Facebook Messenger after placing your order. No design? Describe it in the form and we'll help.</div></div>
-      <div class="fi r d3"><button class="fq" aria-expanded="false">How do I pay?<span class="ficon">+</span></button><div class="fa">We accept GCash and cash on pick-up. A down payment may be required for large orders. Details will be discussed after order confirmation.</div></div>
-      <div class="fi r"><button class="fq" aria-expanded="false">How do I track my order?<span class="ficon">+</span></button><div class="fa">After placing an order you get an Order ID. Visit the <a href="lookup.html" style="color:var(--rust);font-weight:600">Order Tracking</a> page, enter your Order ID and the contact you used, and check your status anytime.</div></div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">How long does an order take?</button>
+        <div class="faq-answer"><p>Rush orders take 3–5 days; standard orders 7–14 days, depending on quantity and design complexity. Please include your deadline in the form and we'll confirm if it's feasible.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">Is there a minimum order quantity?</button>
+        <div class="faq-answer"><p>We accept orders of any size. Pricing per piece improves for bulk orders (10+ pieces). Contact us to discuss smaller quantity pricing.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">Can I send my own design?</button>
+        <div class="faq-answer"><p>Yes! Send your design (PNG, JPG, or AI file) through Facebook Messenger after placing your order. No design? Describe it in the form and we'll help.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">How do I pay?</button>
+        <div class="faq-answer"><p>We accept GCash and cash on pick-up. A down payment may be required for large orders. Details will be discussed after order confirmation.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">How do I track my order?</button>
+        <div class="faq-answer"><p>After placing an order you get an Order ID. Visit the <a href="lookup.html">Order Tracking</a> page, enter your Order ID and the contact you used, and check your status anytime.</p></div>
+      </div>
     </div>
   </div>
 </section>
 
-<footer>
-  <div class="wrap">
-    <div class="ftop">
-      <div class="fbrand">
-        <div class="bicon" style="width:36px;height:36px;font-size:14px" aria-hidden="true">JT</div>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-about">
+        <span class="brand-mark" aria-hidden="true">JT</span>
         <p>Premium custom jerseys and apparel, handcrafted in Manolo Fortich, Bukidnon. Quality gear for every team.</p>
-        <div class="fcontact">
-          <a href="tel:+639171033957">📞 0917-103-3957</a>
-          <a href="mailto:juehtailoring@gmail.com">✉️ juehtailoring@gmail.com</a>
-          <a href="https://www.facebook.com/profile.php?id=100090775430928" target="_blank" rel="noopener">👍 Facebook Page</a>
-        </div>
+        <a href="tel:+639171033957">📞 0917-103-3957</a>
+        <a href="mailto:juehtailoring@gmail.com">✉️ juehtailoring@gmail.com</a>
+        <a href="https://www.facebook.com/profile.php?id=100090775430928" target="_blank" rel="noopener">👍 Facebook Page</a>
       </div>
-      <div class="fcol"><h4>Navigate</h4><ul><li><a href="#process">How It Works</a></li><li><a href="#services">Services</a></li><li><a href="#order">Order Now</a></li><li><a href="#faq">FAQ</a></li></ul></div>
-      <div class="fcol"><h4>Account</h4><ul><li><a href="lookup.html">Track My Order</a></li><li><a href="owner.html">Owner Dashboard</a></li></ul><h4 style="margin-top:22px">Legal</h4><ul><li><a href="policy.html">Privacy &amp; Terms</a></li></ul><h4 style="margin-top:22px">Location</h4><p style="font-size:13px;line-height:1.6;margin:0">Purok-Centro, Tankulan<br>Manolo Fortich, Bukidnon</p></div>
+      <div class="footer-col">
+        <h4>Navigate</h4>
+        <ul>
+          <li><a href="#process">How It Works</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#order">Order Now</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Account</h4>
+        <ul>
+          <li><a href="lookup.html">Track My Order</a></li>
+          <li><a href="owner.html">Owner Dashboard</a></li>
+        </ul>
+        <h4>Legal</h4>
+        <ul><li><a href="policy.html">Privacy &amp; Terms</a></li></ul>
+        <h4>Location</h4>
+        <p>Purok-Centro, Tankulan<br>Manolo Fortich, Bukidnon</p>
+      </div>
     </div>
-    <div class="fbot"><span>© 2026 Jueh Tailoring. All rights reserved.</span><span>Built by <a href="#">Criss</a></span></div>
+    <div class="footer-bottom">
+      <span>© 2026 Jueh Tailoring. All rights reserved.</span>
+      <span>Built by <a href="#">Criss</a></span>
+    </div>
   </div>
 </footer>
 
-<script>
-const SHEETS_WEBAPP_URL='https://script.google.com/macros/s/AKfycbyHen3-Ifrt8D_D91V0TgE4zzPrpStrf-LzvUvIg6Jm0mO6fW89iDEGJ9K8tV53Lved/exec';
-
-// Consent gate
-(function(){
-  if(localStorage.getItem('jt_consent')==='1')return;
-  var overlay=document.getElementById('consentOverlay');
-  var check=document.getElementById('consentCheck');
-  var agree=document.getElementById('consentAgree');
-  var decline=document.getElementById('consentDecline');
-  overlay.classList.add('show');
-  check.addEventListener('change',function(){agree.disabled=!check.checked;});
-  agree.addEventListener('click',function(){
-    localStorage.setItem('jt_consent','1');
-    overlay.classList.remove('show');
-  });
-  decline.addEventListener('click',function(){
-    history.length>1?history.back():location.href='about:blank';
-  });
-})();
-
-function callApi(action,params){return new Promise(function(res,rej){var cb='cb_'+Date.now()+'_'+(Math.random()*9999|0),qs=Object.assign({action:action,callback:cb},params||{}),url=SHEETS_WEBAPP_URL+'?'+Object.keys(qs).map(k=>encodeURIComponent(k)+'='+encodeURIComponent(qs[k])).join('&'),s=document.createElement('script');window[cb]=function(d){delete window[cb];s.parentNode&&s.parentNode.removeChild(s);res(d)};s.onerror=function(){delete window[cb];s.parentNode&&s.parentNode.removeChild(s);rej(new Error('fail'))};document.body.appendChild(s);s.src=url})}
-
-// Scroll reveal
-var io=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('on');io.unobserve(x.target)}})},{threshold:.1,rootMargin:'0px 0px -36px 0px'});
-document.querySelectorAll('.r').forEach(function(el){io.observe(el)});
-
-// Header shadow
-var hdr=document.getElementById('hdr');
-window.addEventListener('scroll',function(){hdr.classList.toggle('sd',scrollY>20)},{passive:true});
-
-// Mobile menu
-var mbtn=document.getElementById('mbtn');
-mbtn.addEventListener('click',function(){var o=hdr.classList.toggle('op');this.textContent=o?'✕':'☰';this.setAttribute('aria-expanded',o)});
-document.addEventListener('click',function(e){if(!hdr.contains(e.target)&&hdr.classList.contains('op')){hdr.classList.remove('op');mbtn.textContent='☰';mbtn.setAttribute('aria-expanded',false)}});
-
-// Theme
-var tbtn=document.getElementById('tbtn'),root=document.documentElement;
-(function(){var s=localStorage.getItem('jt_theme');if(s){root.dataset.theme=s;tbtn.textContent=s==='dark'?'☀':'🌙'}})();
-tbtn.addEventListener('click',function(){var d=root.dataset.theme==='dark';root.dataset.theme=d?'light':'dark';this.textContent=d?'🌙':'☀';localStorage.setItem('jt_theme',root.dataset.theme)});
-
-// Stats counter
-var sio=new IntersectionObserver(function(e){e.forEach(function(x){if(!x.isIntersecting)return;var el=x.target,t=+el.dataset.target,st=null;function tick(ts){if(!st)st=ts;var p=Math.min((ts-st)/1400,1),ease=1-Math.pow(1-p,3);el.textContent=Math.round(ease*t)+'+';if(p<1)requestAnimationFrame(tick)}requestAnimationFrame(tick);sio.unobserve(el)})},{threshold:.5});
-document.querySelectorAll('.stat-n[data-target]').forEach(function(el){sio.observe(el)});
-
-// FAQ
-document.querySelectorAll('.fq').forEach(function(btn){btn.addEventListener('click',function(){var item=this.closest('.fi'),was=item.classList.contains('op');document.querySelectorAll('.fi.op').forEach(function(i){i.classList.remove('op');i.querySelector('.fq').setAttribute('aria-expanded',false)});if(!was){item.classList.add('op');this.setAttribute('aria-expanded',true)}})});
-
-// Site status
-var siteOpen=true;
-callApi('getSiteStatus',{}).then(function(d){if(d&&d.status==='ok'&&d.open===false){siteOpen=false;document.getElementById('cbanner').classList.add('on');var b=document.getElementById('subBtn');b.disabled=true;b.textContent='Orders Paused'}}).catch(function(){});
-
-// Form
-var form=document.getElementById('orderForm'),subBtn=document.getElementById('subBtn'),fstatus=document.getElementById('fstatus'),busy=false;
-function hint(id,msg){var h=document.getElementById(id+'-h'),inp=document.getElementById(id);if(h)h.textContent=msg;if(inp)inp.classList.toggle('er',!!msg)}
-function clearAll(){document.querySelectorAll('.hint').forEach(function(h){h.textContent=''});document.querySelectorAll('.fld input,.fld select,.fld textarea').forEach(function(el){el.classList.remove('er')})}
-function validContact(v){return/^[\d\s\-\+\(\)]{7,15}$/.test(v.replace(/\s/g,''))||/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}
-['name','contact','itemType','quantity'].forEach(function(id){var el=document.getElementById(id);if(!el)return;el.addEventListener('blur',function(){if(!this.value.trim())hint(id,'Required.');else if(id==='contact'&&!validContact(this.value.trim()))hint(id,'Enter a valid phone or email.');else if(id==='quantity'&&+this.value<1)hint(id,'Must be at least 1.');else hint(id,'')})});
-document.getElementById('deadline').min=new Date().toISOString().split('T')[0];
-
-form.addEventListener('submit',function(e){
-  e.preventDefault();
-  if(busy)return;
-  clearAll();fstatus.className='fstatus';
-  var name=document.getElementById('name').value.trim(),contact=document.getElementById('contact').value.trim(),itemType=document.getElementById('itemType').value,quantity=document.getElementById('quantity').value.trim(),deadline=document.getElementById('deadline').value,ok=true;
-  if(!name){hint('name','Required.');ok=false}
-  if(!contact){hint('contact','Required.');ok=false}else if(!validContact(contact)){hint('contact','Enter a valid phone or email.');ok=false}
-  if(!itemType){hint('itemType','Required.');ok=false}
-  if(!quantity||+quantity<1){hint('quantity','Enter a valid quantity.');ok=false}
-  if(deadline&&deadline<new Date().toISOString().split('T')[0]){hint('deadline','Cannot be in the past.');ok=false}
-  if(!ok)return;
-  if(!siteOpen){fstatus.className='fstatus er on';fstatus.textContent='Sorry, orders are currently paused. Please check back later.';return}
-  busy=true;subBtn.disabled=true;subBtn.textContent='Sending…';
-  var payload={name,contact,itemType,quantity,sizes:document.getElementById('sizes').value.trim(),details:document.getElementById('details').value.trim(),deadline,budget:document.getElementById('budget').value};
-  function submit(){
-    callApi('newOrder',payload).then(function(res){
-      busy=false;subBtn.disabled=false;subBtn.textContent='Send Order Request';
-      if(!res||res.status!=='ok'){fstatus.className='fstatus er on';fstatus.textContent=res&&res.message?res.message:'Something went wrong. Please try again.';return}
-      var id=res.orderId;
-      navigator.clipboard&&navigator.clipboard.writeText(id).catch(function(){});
-      fstatus.className='fstatus ok on';fstatus.innerHTML='✅ Order received! Your ID is <strong>'+id+'</strong> — redirecting to tracking…';
-      form.reset();
-      setTimeout(function(){document.body.classList.add('out');setTimeout(function(){location.href='lookup.html?'+new URLSearchParams({orderId:id,contact:payload.contact})},350)},1200);
-    }).catch(function(){busy=false;subBtn.disabled=false;subBtn.textContent='Send Order Request';fstatus.className='fstatus er on';fstatus.textContent='Connection error — check your network and try again.'});
-  }
-  callApi('getSiteStatus',{}).then(function(d){
-    if(d&&d.status==='ok'&&d.open===false){busy=false;subBtn.disabled=false;subBtn.textContent='Send Order Request';fstatus.className='fstatus er on';fstatus.textContent='Ordering was just closed. Please try again later.';siteOpen=false;document.getElementById('cbanner').classList.add('on')}
-    else submit();
-  }).catch(submit);
-});
-</script>
+<script src="js/common.js"></script>
+<script src="js/home.js"></script>
 </body>
 </html>

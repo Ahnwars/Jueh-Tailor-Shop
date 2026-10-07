@@ -8,65 +8,25 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root{--sky:#0B1345;--horizon:#E89A4C;--horizon-deep:#C15A3A;--canvas:#F7F4EC;--panel:#FFF;--ink:#101418;--soft:#4B5563;--hair:#DDD6C4;--focus:#2F6FED;}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--canvas);color:var(--ink);font-family:'Inter',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;animation:pgIn .45s ease both;}
-@keyframes pgIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-body.out{animation:pgOut .35s ease forwards;}
-@keyframes pgOut{to{opacity:0;transform:translateY(-14px)}}
-h1,h2,h3{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.01em;line-height:1.1;}
-a{color:var(--horizon-deep);}
-a:hover{text-decoration:underline;}
-.wrap{max-width:760px;margin:0 auto;padding:0 24px;}
-
-header{background:var(--sky);color:#F2EFE6;border-bottom:3px solid var(--horizon);padding:16px 24px;}
-header .inner{max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
-header h1{font-size:18px;}
-header a.back{font-size:13px;color:#D9DEE8;text-decoration:none;}
-header a.back:hover{color:#fff;}
-
-main{padding:52px 0 80px;}
-
-/* TOC */
-.toc{background:var(--panel);border:1px solid var(--hair);border-radius:8px;padding:20px 24px;margin-bottom:40px;}
-.toc h2{font-size:13px;color:var(--soft);margin-bottom:10px;}
-.toc ol{padding-left:18px;font-size:14px;line-height:2;}
-.toc a{color:var(--sky);text-decoration:none;font-weight:500;}
-.toc a:hover{text-decoration:underline;}
-
-/* Sections */
-.doc-section{margin-bottom:48px;}
-.doc-section h2{font-size:22px;border-bottom:2px solid var(--horizon);padding-bottom:8px;margin-bottom:20px;}
-.doc-section h3{font-size:15px;margin:20px 0 8px;}
-.doc-section p,.doc-section li{font-size:15px;line-height:1.75;color:#1f2937;}
-.doc-section ul,.doc-section ol{padding-left:20px;margin:8px 0;}
-.doc-section li{margin-bottom:4px;}
-.doc-section strong{color:var(--ink);}
-.note{background:#FFF8EE;border-left:3px solid var(--horizon);padding:12px 16px;border-radius:0 5px 5px 0;font-size:14px;margin:12px 0;color:#5C3A10;}
-.updated{font-size:13px;color:var(--soft);margin-bottom:20px;}
-
-footer{background:var(--sky);color:#9CA9C4;text-align:center;padding:28px 24px;font-size:13px;}
-footer a{color:#D9DEE8;text-decoration:none;}
-footer a:hover{color:#fff;}
-</style>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/policy.css">
 </head>
 <body>
 
-<header>
-  <div class="inner">
-    <h1>Jueh Tailoring</h1>
-    <a class="back" href="index.html">← Back to site</a>
+<header class="site-header">
+  <div class="header-inner">
+    <h1 class="page-title">Jueh Tailoring</h1>
+    <a class="back-link" href="index.html">← Back to site</a>
   </div>
 </header>
 
 <main>
-<div class="wrap">
+<div class="doc">
 
-  <h2 style="font-size:28px;margin-bottom:6px;">Privacy &amp; Terms</h2>
+  <h1>Privacy &amp; Terms</h1>
   <p class="updated">Last Updated: October 4, 2026</p>
 
-  <div class="toc">
+  <div class="contents">
     <h2>Contents</h2>
     <ol>
       <li><a href="#privacy">Privacy Policy</a></li>
@@ -75,7 +35,6 @@ footer a:hover{color:#fff;}
     </ol>
   </div>
 
-  <!-- 1. PRIVACY POLICY -->
   <div class="doc-section" id="privacy">
     <h2>1. Privacy Policy</h2>
 
@@ -112,7 +71,6 @@ footer a:hover{color:#fff;}
     <p>Our website is not directed at individuals under 18 years of age. We do not knowingly collect personal data from minors without verifiable parental consent.</p>
   </div>
 
-  <!-- 2. TERMS OF SERVICE -->
   <div class="doc-section" id="terms">
     <h2>2. Terms of Service</h2>
 
@@ -126,7 +84,7 @@ footer a:hover{color:#fff;}
     <p>You are responsible for providing accurate order details (item type, quantity, sizing specifications, needed-by date, and contact information). Jueh Tailoring shall not be liable for errors or delays caused by inaccurate information submitted through the order form.</p>
 
     <h3>Cancellations &amp; Non-Refundable Deposits</h3>
-    <div class="note">Once production has commenced (fabric has been cut or sewing has begun), orders cannot be cancelled and any deposits paid are non-refundable, in accordance with RA 11967 and the custom, non-resellable nature of made-to-measure goods.</div>
+    <div class="callout">Once production has commenced (fabric has been cut or sewing has begun), orders cannot be cancelled and any deposits paid are non-refundable, in accordance with RA 11967 and the custom, non-resellable nature of made-to-measure goods.</div>
     <p>Cancellation requests before production begins may be accommodated at the owner's discretion. Contact us as soon as possible via Messenger.</p>
 
     <h3>Alterations &amp; Fit</h3>
@@ -145,7 +103,6 @@ footer a:hover{color:#fff;}
     <p>These Terms are governed by the laws of the <strong>Republic of the Philippines</strong>. Disputes shall first be resolved through good-faith negotiation; unresolved disputes may be brought before the appropriate courts of <strong>Bukidnon, Philippines</strong>.</p>
   </div>
 
-  <!-- 3. COOKIE POLICY -->
   <div class="doc-section" id="cookies">
     <h2>3. Cookie Policy</h2>
 
@@ -167,21 +124,11 @@ footer a:hover{color:#fff;}
 </div>
 </main>
 
-<footer>
+<footer class="policy-footer">
   <p>© 2026 Jueh Tailoring · Manolo Fortich, Bukidnon, Philippines</p>
-  <p style="margin-top:6px;"><a href="index.html">Home</a> · <a href="policy.html">Privacy &amp; Terms</a></p>
+  <p><a href="index.html">Home</a> · <a href="policy.html">Privacy &amp; Terms</a></p>
 </footer>
 
-<script>
-document.querySelectorAll('a[href]').forEach(function(a) {
-  const href = a.getAttribute('href');
-  if (!href || href.startsWith('#') || href.startsWith('http')) return;
-  a.addEventListener('click', function(e) {
-    e.preventDefault();
-    document.body.classList.add('out');
-    setTimeout(function() { location.href = href; }, 350);
-  });
-});
-</script>
+<script src="js/common.js"></script>
 </body>
 </html>
