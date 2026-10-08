@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orders — Jueh Tailoring</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/panel.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <h1 class="page-title">Jueh Tailoring — Orders</h1>
+    <button class="logout hidden" id="logout-btn">Log out</button>
+  </div>
+</header>
+
+<main>
+  <div class="wide">
+
+    <div class="narrow" id="gate" style="padding:0">
+      <div class="card">
+        <h2>Owner Access</h2>
+        <p class="intro">Enter your passcode to view and manage orders.</p>
+        <div class="field">
+          <label for="passcode">Passcode</label>
+          <input type="password" id="passcode" autocomplete="current-password" placeholder="••••••">
+        </div>
+        <button class="btn btn-primary btn-block" id="login-btn">Enter</button>
+        <div class="error-text" id="gate-error"></div>
+      </div>
+    </div>
+
+    <div id="dashboard" class="hidden">
+      <div class="toolbar">
+        <input type="search" id="search-box" placeholder="Search order ID, name, item…">
+        <select id="status-filter">
+          <option value="">All statuses</option>
+          <option value="New">New</option>
+          <option value="Ongoing">Ongoing</option>
+          <option value="Done">Done</option>
+        </select>
+        <span class="order-count" id="order-count"></span>
+      </div>
+      <div class="order-list" id="order-list"></div>
+      <div class="pager" id="pager"></div>
+    </div>
+
+  </div>
+</main>
+
+<script src="js/common.js"></script>
+<script src="js/orders.js"></script>
+<script src="js/owner.js"></script>
+</body>
+</html>

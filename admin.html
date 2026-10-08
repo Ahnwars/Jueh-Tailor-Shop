@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admin — Jueh Tailoring</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/panel.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <h1 class="page-title">Jueh Tailoring</h1>
+    <span class="role-chip">Admin</span>
+    <button class="logout hidden" id="logout-btn">Log out</button>
+  </div>
+</header>
+
+<main>
+  <div class="wide">
+
+    <div class="narrow" id="gate" style="padding:0">
+      <div class="card">
+        <h2>Access</h2>
+        <p class="intro">Owner access manages orders. Admin access also controls the site.</p>
+
+        <div class="tabs">
+          <button class="tab active" data-tab="owner">Owner</button>
+          <button class="tab" data-tab="admin">Admin</button>
+        </div>
+
+        <div class="tab-pane active" id="tab-owner">
+          <div class="access-note">Owner access: view and update orders only.</div>
+          <div class="field">
+            <label for="owner-passcode">Owner Passcode</label>
+            <input type="password" id="owner-passcode" placeholder="••••••" autocomplete="current-password">
+          </div>
+          <button class="btn btn-primary btn-block" id="owner-login-btn">Enter as Owner</button>
+        </div>
+
+        <div class="tab-pane" id="tab-admin">
+          <div class="access-note" style="background:#ffeceb;color:#7a1818;">Admin access: site control + order management. Keep this passcode private.</div>
+          <div class="field">
+            <label for="admin-passcode">Admin Passcode</label>
+            <input type="password" id="admin-passcode" placeholder="••••••" autocomplete="current-password">
+          </div>
+          <button class="btn btn-primary btn-block" id="admin-login-btn">Enter as Admin</button>
+        </div>
+
+        <div class="error-text" id="gate-error"></div>
+      </div>
+    </div>
+
+    <div id="dashboard" class="hidden">
+
+      <div class="site-control hidden" id="site-control">
+        <div>
+          <strong>Site Status</strong>
+          <span id="site-status-desc">Loading…</span>
+        </div>
+        <div class="toggle-group">
+          <span id="toggle-label">—</span>
+          <input type="checkbox" class="switch" id="site-toggle">
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <input type="search" id="search-box" placeholder="Search order ID, name, item…">
+        <select id="status-filter">
+          <option value="">All statuses</option>
+          <option value="New">New</option>
+          <option value="Ongoing">Ongoing</option>
+          <option value="Done">Done</option>
+        </select>
+        <span class="order-count" id="order-count"></span>
+      </div>
+      <div class="order-list" id="order-list"></div>
+      <div class="pager" id="pager"></div>
+    </div>
+
+  </div>
+</main>
+
+<script src="js/common.js"></script>
+<script src="js/orders.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
