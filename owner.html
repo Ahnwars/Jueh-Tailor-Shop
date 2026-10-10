@@ -3,20 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Orders — Jueh Tailoring</title>
+<title>Owner Dashboard — Jueh Tailoring</title>
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/panel.css">
+<link rel="stylesheet" href="css/owner.css">
 </head>
-<body>
+<body class="owner-page">
 
 <header class="site-header">
   <div class="header-inner">
-    <h1 class="page-title">Jueh Tailoring — Orders</h1>
-    <button class="logout hidden" id="logout-btn">Log out</button>
+    <div class="owner-brand">
+      <span class="owner-mark" aria-hidden="true">JT</span>
+      <div>
+        <h1 class="page-title">Jueh Tailoring</h1>
+        <span class="owner-header-subtitle">Owner dashboard</span>
+      </div>
+    </div>
+    <button class="logout hidden" id="logout-btn" type="button">Log out</button>
   </div>
 </header>
 
@@ -26,27 +33,68 @@
     <div class="narrow" id="gate" style="padding:0">
       <div class="card">
         <h2>Owner Access</h2>
-        <p class="intro">Enter your passcode to view and manage orders.</p>
+        <p class="intro">Sign in to review orders, open customer designs, and update order status.</p>
         <div class="field">
-          <label for="passcode">Passcode</label>
-          <input type="password" id="passcode" autocomplete="current-password" placeholder="••••••">
+          <label for="passcode">Owner Passcode</label>
+          <input type="password" id="passcode" autocomplete="current-password" placeholder="Enter your passcode">
         </div>
-        <button class="btn btn-primary btn-block" id="login-btn">Enter</button>
-        <div class="error-text" id="gate-error"></div>
+        <button class="btn btn-primary btn-block" id="login-btn" type="button">Open Orders</button>
+        <div class="error-text" id="gate-error" role="alert"></div>
       </div>
     </div>
 
     <div id="dashboard" class="hidden">
-      <div class="toolbar">
-        <input type="search" id="search-box" placeholder="Search order ID, name, item…">
-        <select id="status-filter">
+      <div class="owner-dashboard-header">
+        <div>
+          <p class="owner-eyebrow">SHOP OVERVIEW</p>
+          <h2 class="owner-heading">Order dashboard</h2>
+          <p class="owner-subtitle">New orders appear first. Select a design preview to open the original file in Google Drive.</p>
+        </div>
+        <button class="btn btn-primary owner-refresh" id="refresh-orders" type="button">↻ Refresh orders</button>
+      </div>
+
+      <div class="owner-quick-guide" role="note">
+        <strong>Quick guide</strong>
+        <span>1. Check the customer details and design.</span>
+        <span>2. Set the order status and add a note if needed.</span>
+        <span>3. Press <strong>Save</strong> to update the order.</span>
+      </div>
+
+      <section class="owner-stats" aria-label="Order summary">
+        <div class="owner-stat">
+          <span class="owner-stat-label">New</span>
+          <strong class="owner-stat-value" id="new-count">0</strong>
+        </div>
+        <div class="owner-stat">
+          <span class="owner-stat-label">In progress</span>
+          <strong class="owner-stat-value" id="ongoing-count">0</strong>
+        </div>
+        <div class="owner-stat">
+          <span class="owner-stat-label">Completed</span>
+          <strong class="owner-stat-value" id="done-count">0</strong>
+        </div>
+        <div class="owner-stat">
+          <span class="owner-stat-label">With design</span>
+          <strong class="owner-stat-value" id="design-count">0</strong>
+        </div>
+      </section>
+
+      <div class="toolbar owner-toolbar">
+        <input type="search" id="search-box" placeholder="Search order ID, customer, or item…" aria-label="Search orders">
+        <select id="status-filter" aria-label="Filter by status">
           <option value="">All statuses</option>
           <option value="New">New</option>
           <option value="Ongoing">Ongoing</option>
           <option value="Done">Done</option>
         </select>
-        <span class="order-count" id="order-count"></span>
+        <label class="owner-design-filter" for="design-only-filter">
+          <input type="checkbox" id="design-only-filter">
+          <span>With design only</span>
+        </label>
+        <span class="order-count" id="order-count" aria-live="polite"></span>
       </div>
+
+      <p class="owner-feedback" id="owner-feedback" role="status" aria-live="polite"></p>
       <div class="order-list" id="order-list"></div>
       <div class="pager" id="pager"></div>
     </div>

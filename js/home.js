@@ -235,7 +235,7 @@ function setupFileDrop() {
  * Because we cannot read the iframe's response, this is fire-and-forget:
  * the order is already saved; Apps Script will attach the Drive link to it.
  */
-function uploadDesignFile(file, orderId) {
+function uploadDesignFile(file, orderId, uploadToken) {
   return new Promise(function (resolve) {
     var reader = new FileReader();
 
@@ -263,7 +263,8 @@ function uploadDesignFile(file, orderId) {
         orderId:  orderId,
         filename: file.name,
         mimeType: file.type || 'application/octet-stream',
-        data:     base64Data
+        data:     base64Data,
+        uploadToken: uploadToken
       };
 
       Object.keys(fields).forEach(function (key) {
@@ -402,6 +403,16 @@ function setupOrderForm() {
       return;
     }
 
+    const fileForValidation = document.getElementById('design-file').files[0];
+    if (fileForValidation) {
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+      if (allowedTypes.indexOf(fileForValidation.type) === -1 || fileForValidation.size > 5 * 1024 * 1024) {
+        message.className = 'form-message error show';
+        message.textContent = 'Design file must be a JPG, PNG, WEBP, or PDF under 5 MB.';
+        return;
+      }
+    }
+
     const payload = {
       name: name,
       contact: contact,
@@ -464,7 +475,7 @@ function setupOrderForm() {
         if (chosenFile) {
           message.className = 'form-message uploading show';
           message.textContent = '✅ Order received! Uploading your design file…';
-          uploadDesignFile(chosenFile, orderId).then(function () {
+          uploadDesignFile(chosenFile, orderId, res.uploadToken).then(function () {
             redirect(orderId, payload.contact);
           });
         } else {
@@ -490,11 +501,30 @@ function setupOrderForm() {
   }
 
   function redirect(orderId, contact) {
+    // Transfer order details securely to lookup.html without adding the
+    // customer's contact information to the URL.
+    let prefillSaved = false;
+    try {
+      const prefill = JSON.stringify({ orderId: orderId, contact: contact });
+      sessionStorage.setItem('jt_lookup_prefill', prefill);
+      prefillSaved = sessionStorage.getItem('jt_lookup_prefill') === prefill;
+    } catch (ignore) {}
+
+    // If this browser blocks session storage, do not send the customer to an
+    // empty tracking form. Show the Order ID and a clear manual next step.
+    if (!prefillSaved) {
+      message.className = 'form-message success show';
+      message.innerHTML =
+        '✅ Order received! Your ID is <strong>' + escapeHtml(orderId) +
+        '</strong>. Automatic fill is unavailable in this browser. ' +
+        '<a href="lookup.html">Open order tracking</a> and enter your Order ID and contact.';
+      return;
+    }
+
     setTimeout(function () {
       document.body.classList.add('leaving');
       setTimeout(function () {
-        const params = new URLSearchParams({ orderId: orderId, contact: contact });
-        window.location.href = 'lookup.html?' + params.toString();
+        window.location.href = 'lookup.html';
       }, 300);
     }, 1200);
   }
