@@ -501,13 +501,29 @@ function setupOrderForm() {
   }
 
   function redirect(orderId, contact) {
+    // Transfer order details securely to lookup.html without adding the
+    // customer's contact information to the URL.
+    let prefillSaved = false;
+    try {
+      const prefill = JSON.stringify({ orderId: orderId, contact: contact });
+      sessionStorage.setItem('jt_lookup_prefill', prefill);
+      prefillSaved = sessionStorage.getItem('jt_lookup_prefill') === prefill;
+    } catch (ignore) {}
+
+    // If this browser blocks session storage, do not send the customer to an
+    // empty tracking form. Show the Order ID and a clear manual next step.
+    if (!prefillSaved) {
+      message.className = 'form-message success show';
+      message.innerHTML =
+        '✅ Order received! Your ID is <strong>' + escapeHtml(orderId) +
+        '</strong>. Automatic fill is unavailable in this browser. ' +
+        '<a href="lookup.html">Open order tracking</a> and enter your Order ID and contact.';
+      return;
+    }
+
     setTimeout(function () {
       document.body.classList.add('leaving');
       setTimeout(function () {
-        // Keep personal contact details out of URL history and referrer headers.
-        try {
-          sessionStorage.setItem('jt_lookup_prefill', JSON.stringify({ orderId: orderId, contact: contact }));
-        } catch (ignore) {}
         window.location.href = 'lookup.html';
       }, 300);
     }, 1200);
