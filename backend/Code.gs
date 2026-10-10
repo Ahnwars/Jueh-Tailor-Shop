@@ -166,6 +166,41 @@ function lockDownDesignFiles() {
   return 'Made the folder private and updated ' + count + ' files.';
 }
 
+function normalizeSmsPhone_(contact) {
+  if (String(contact || '').indexOf('@') !== -1) return '';
+  var digits = String(contact || '').replace(/\D/g, '');
+  if (digits.indexOf('0') === 0 && digits.length === 11) {
+    digits = '63' + digits.slice(1);
+  } else if (digits.length === 10 && digits.charAt(0) === '9') {
+    digits = '63' + digits;
+  }
+  // Semaphore expects Philippine mobile numbers in 639XXXXXXXXX format.
+  return /^639\d{9}$/.test(digits) ? digits : '';
+}
+
+function sendOrderReceivedSms_(contact, orderId) {
+  var apiKey = getSecret_('SEMAPHORE_API_KEY');
+  if (!apiKey) return; // SMS is optional. Order creation must still succeed.
+  var phone = normalizeSmsPhone_(contact);
+  if (!phone) return; // Do not try to text emails, landlines, or malformed numbers.
+  try {
+    var sender = getSecret_('SEMAPHORE_SENDER') || 'JuehTailor';
+    var message = 'Jueh Tailoring: We received your order ' + orderId +
+      '. Keep this ID to check your order status. We will text you when it is ready.';
+    var response = UrlFetchApp.fetch('https://api.semaphore.co/api/v4/messages', {
+      method: 'post',
+      payload: { apikey: apiKey, number: phone, message: message, sendername: sender },
+      muteHttpExceptions: true
+    });
+    if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) {
+      Logger.log('Order received SMS failed for order ' + orderId + '. HTTP ' + response.getResponseCode());
+    }
+  } catch (err) {
+    // Notification problems must never undo or block a successfully saved order.
+    Logger.log('Order received SMS failed for order ' + orderId + ': ' + err.message);
+  }
+}
+
 function sendDoneEmail_(contact, name, orderId) {
   try {
     MailApp.sendEmail({
@@ -186,8 +221,8 @@ function sendDoneSms_(contact, name, orderId) {
   var apiKey = getSecret_('SEMAPHORE_API_KEY');
   if (!apiKey) return;
   try {
-    var phone = String(contact || '').replace(/\D/g, '');
-    if (phone.charAt(0) === '0') phone = '63' + phone.slice(1);
+    var phone = normalizeSmsPhone_(contact);
+    if (!phone) return;
     var sender = getSecret_('SEMAPHORE_SENDER') || 'JuehTailor';
     var message = 'Hi ' + name + '! Your Jueh Tailoring order (' + orderId + ') is ready for pick-up. Questions? Message us on FB. Thank you!';
     UrlFetchApp.fetch('https://api.semaphore.co/api/v4/messages', {
@@ -308,6 +343,8 @@ function handleRequest_(p, method) {
         safeText_(p.budget, 100), 'New', '', '', hashToken_(uploadToken)
       ]);
       cache.put(cacheKey, '1', 60);
+      // Best-effort SMS after the order is safely saved; SMS failure doesn't block it.
+      sendOrderReceivedSms_(contact, orderId);
       return jsonOut_({ status: 'ok', orderId: orderId, uploadToken: uploadToken });
     } catch (err) {
       Logger.log('Order creation error: ' + err.message);
