@@ -3,8 +3,7 @@
  * Configure Script Properties:
  *   OWNER_PASSCODE (unique, long password, 20+ chars)
  *   ADMIN_PASSCODE (different unique password, 20+ chars)
- *   SEMAPHORE_API_KEY (optional)
- *   SEMAPHORE_SENDER (optional)
+ *   TEXTBEE_API_KEY (optional)
  *
  * Deploy as Web app, execute as Me, who has access Anyone. Public actions are
  * limited and validated; administrative operations require server-held secrets.
@@ -166,6 +165,19 @@ function lockDownDesignFiles() {
   return 'Made the folder private and updated ' + count + ' files.';
 }
 
+function normalizeSmsPhone_(contact) {
+  if (String(contact || '').indexOf('@') !== -1) return '';
+  var digits = String(contact || '').replace(/\D/g, '');
+  if (digits.indexOf('0') === 0 && digits.length === 11) {
+    digits = '63' + digits.slice(1);
+  } else if (digits.length === 10 && digits.charAt(0) === '9') {
+    digits = '63' + digits;
+  }
+  // TextBee expects E.164 Philippine mobile numbers in 639XXXXXXXXX format.
+  // TextBee expects international E.164 format, including the leading plus.
+  return /^639\d{9}$/.test(digits) ? '+' + digits : '';
+}
+
 function sendDoneEmail_(contact, name, orderId) {
   try {
     MailApp.sendEmail({
@@ -182,22 +194,46 @@ function sendDoneEmail_(contact, name, orderId) {
     Logger.log('Email error for ' + orderId + ': ' + err.message);
   }
 }
-function sendDoneSms_(contact, name, orderId) {
-  var apiKey = getSecret_('SEMAPHORE_API_KEY');
-  if (!apiKey) return;
+
+function sendTextBeeSms_(contact, message, orderId) {
+  var apiKey = getSecret_('TEXTBEE_API_KEY');
+  if (!apiKey) return; // SMS optional until configured.
+  var phone = normalizeSmsPhone_(contact);
+  if (!phone) return; // Skip email contacts and malformed numbers.
   try {
-    var phone = String(contact || '').replace(/\D/g, '');
-    if (phone.charAt(0) === '0') phone = '63' + phone.slice(1);
-    var sender = getSecret_('SEMAPHORE_SENDER') || 'JuehTailor';
-    var message = 'Hi ' + name + '! Your Jueh Tailoring order (' + orderId + ') is ready for pick-up. Questions? Message us on FB. Thank you!';
-    UrlFetchApp.fetch('https://api.semaphore.co/api/v4/messages', {
+    var payload = { recipients: [phone], message: message };
+    // Optional device ID; omit it to use the default/most recently active device.
+    var deviceId = getSecret_('TEXTBEE_DEVICE_ID');
+    if (deviceId) payload.deviceId = deviceId;
+    var response = UrlFetchApp.fetch('https://api.textbee.dev/api/v1/gateway/send-sms', {
       method: 'post',
-      payload: { apikey: apiKey, number: phone, message: message, sendername: sender },
+      contentType: 'application/json',
+      headers: { 'x-api-key': apiKey },
+      payload: JSON.stringify(payload),
       muteHttpExceptions: true
     });
+    var code = response.getResponseCode();
+    if (code < 200 || code >= 300) {
+      Logger.log('TextBee SMS failed for order ' + orderId + '. HTTP ' + code);
+    }
   } catch (err) {
-    Logger.log('SMS error for ' + orderId + ': ' + err.message);
+    // Order operations must never fail because a notification provider is unavailable.
+    Logger.log('TextBee SMS failed for order ' + orderId + ': ' + err.message);
   }
+}
+
+function sendOrderReceivedSms_(contact, orderId) {
+  sendTextBeeSms_(contact,
+    'Jueh Tailoring: We received your order ' + orderId +
+    '. Keep this ID to check your order status. We will text you when it is ready.',
+    orderId);
+}
+
+function sendDoneSms_(contact, name, orderId) {
+  sendTextBeeSms_(contact,
+    'Hi ' + name + '! Your Jueh Tailoring order (' + orderId +
+    ') is ready for pick-up. Questions? Message us on FB. Thank you!',
+    orderId);
 }
 
 function mimeMatchesBytes_(bytes, mimeType) {
@@ -297,10 +333,12 @@ function handleRequest_(p, method) {
     var cache = CacheService.getScriptCache();
     if (cache.get(cacheKey)) return errorOut_('Please wait one minute before submitting another order with this contact.');
     var lock = LockService.getScriptLock();
+    var orderId = '';
+    var uploadToken = '';
     try {
       lock.waitLock(5000);
-      var orderId = makeOrderId_();
-      var uploadToken = makeUploadToken_();
+      orderId = makeOrderId_();
+      uploadToken = makeUploadToken_();
       getOrdersSheet_().appendRow([
         orderId, new Date(), safeText_(name, 100), safeText_(contact, 150),
         safeText_(itemType, 100), quantity, safeText_(p.sizes, 500),
@@ -308,13 +346,15 @@ function handleRequest_(p, method) {
         safeText_(p.budget, 100), 'New', '', '', hashToken_(uploadToken)
       ]);
       cache.put(cacheKey, '1', 60);
-      return jsonOut_({ status: 'ok', orderId: orderId, uploadToken: uploadToken });
     } catch (err) {
       Logger.log('Order creation error: ' + err.message);
       return errorOut_('The order could not be saved. Please try again.');
     } finally {
       try { lock.releaseLock(); } catch (ignore) {}
     }
+    // Send SMS outside the sheet lock. Failures never undo the saved order.
+    sendOrderReceivedSms_(contact, orderId);
+    return jsonOut_({ status: 'ok', orderId: orderId, uploadToken: uploadToken });
   }
 
   if (action === 'lookupOrder') {
