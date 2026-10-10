@@ -161,6 +161,12 @@ OrderBoard.prototype.renderCard = function (order, index) {
           '📎 View / Download' +
         '</a>' +
       '</div>';
+  } else if (this.showDesignPreview) {
+    fileHtml =
+      '<div class="order-design-missing">' +
+        '<span aria-hidden="true">📎</span>' +
+        '<div><strong>No design attached</strong><br>There is no file on this order yet.</div>' +
+      '</div>';
   }
 
   const sizes = order['Sizes'] || '';
@@ -183,6 +189,7 @@ OrderBoard.prototype.renderCard = function (order, index) {
         '<span class="badge ' + badgeClass + '">' + escapeHtml(status) + '</span>' +
         '<span class="order-time">' + formatDate(order['Timestamp']) + '</span>' +
       '</div>' +
+      fileHtml +
       '<div class="order-info">' +
         '<div><span class="label">Name</span>' + escapeHtml(order['Name'] || '—') + '</div>' +
         '<div><span class="label">Contact</span>' + escapeHtml(order['Contact'] || '—') + '</div>' +
@@ -191,7 +198,6 @@ OrderBoard.prototype.renderCard = function (order, index) {
         '<div><span class="label">Needed by</span>' + escapeHtml(order['Needed By'] || '—') + '</div>' +
       '</div>' +
       extraHtml +
-      fileHtml +
       '<div class="order-edit">' +
         '<div class="field">' +
           '<label>Status</label>' +
