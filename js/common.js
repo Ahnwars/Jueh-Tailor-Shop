@@ -1,102 +1,71 @@
 /*
  * common.js
- * Shared helpers used on every page: talking to the Apps Script backend,
- * escaping text for safe HTML, formatting dates, and the page transition.
+ * Shared helpers for the static site.
+ * API requests use POST so passwords, contact details, and order data do not
+ * appear in URL query strings. Pair with the hardened Apps Script backend.
  */
-
 const SHEETS_WEBAPP_URL =
   'https://script.google.com/macros/s/AKfycbzuMffaNSwWTS6-WVNrkcIyAJMedH8XuW4rYbwRKK-fC_YncLELw8c2Ul7N-TudQTuD/exec';
-
-// Also expose on window so other scripts (home.js uploadDesignFile) can reach it
 window.SHEETS_WEBAPP_URL = SHEETS_WEBAPP_URL;
-
 const REQUEST_TIMEOUT_MS = 15000;
 
-/**
- * Calls the Google Apps Script backend using JSONP (GitHub Pages is static,
- * so a normal fetch would get blocked by CORS). Resolves with whatever
- * object the script responds with, or rejects after a timeout / network error.
- */
 function callApi(action, params) {
-  return new Promise(function (resolve, reject) {
-    const callbackName = 'jt_cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-    const query = Object.assign({ action: action, callback: callbackName }, params || {});
+  const controller = new AbortController();
+  const timer = setTimeout(function () { controller.abort(); }, REQUEST_TIMEOUT_MS);
+  const payload = Object.assign({}, params || {}, { action: action });
 
-    const queryString = Object.keys(query)
-      .map(function (key) {
-        return encodeURIComponent(key) + '=' + encodeURIComponent(query[key]);
-      })
-      .join('&');
-
-    const script = document.createElement('script');
-
-    const timer = setTimeout(function () {
-      cleanup();
-      reject(new Error('timeout'));
-    }, REQUEST_TIMEOUT_MS);
-
-    function cleanup() {
-      clearTimeout(timer);
-      delete window[callbackName];
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    }
-
-    window[callbackName] = function (data) {
-      cleanup();
-      resolve(data);
-    };
-
-    script.onerror = function () {
-      cleanup();
-      reject(new Error('network error'));
-    };
-
-    script.src = SHEETS_WEBAPP_URL + '?' + queryString;
-    document.body.appendChild(script);
-  });
+  return fetch(SHEETS_WEBAPP_URL, {
+    method: 'POST',
+    mode: 'cors',
+    redirect: 'follow',
+    credentials: 'omit',
+    cache: 'no-store',
+    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+    body: JSON.stringify(payload),
+    signal: controller.signal
+  })
+    .then(function (response) {
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      return response.json();
+    })
+    .then(function (data) {
+      if (!data || typeof data !== 'object') throw new Error('Invalid API response');
+      return data;
+    })
+    .catch(function (error) {
+      if (error && error.name === 'AbortError') throw new Error('timeout');
+      throw error;
+    })
+    .finally(function () { clearTimeout(timer); });
 }
 
-/** Escapes a value for safe insertion into innerHTML. */
 function escapeHtml(value) {
   if (value === null || value === undefined) return '';
   return String(value)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
-
-/** Formats a timestamp the way customers in the Philippines expect to read it. */
 function formatDate(value) {
   if (!value) return '—';
   const parsed = new Date(value);
   if (isNaN(parsed)) return escapeHtml(value);
   return parsed.toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' });
 }
-
-/** Today's date in the Philippines (UTC+8), as an ISO string like a date input expects. */
 function phToday() {
   return new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString().split('T')[0];
 }
-
-/**
- * Makes every internal link do a short fade-out before navigating, so page
- * changes don't feel like a jump cut. External links and #anchors are left alone.
- */
 function enablePageTransitions() {
   document.querySelectorAll('a[href]').forEach(function (link) {
     const href = link.getAttribute('href');
     if (!href || href.charAt(0) === '#' || href.indexOf('http') === 0) return;
-
     link.addEventListener('click', function (event) {
       event.preventDefault();
       document.body.classList.add('leaving');
-      setTimeout(function () {
-        window.location.href = href;
-      }, 300);
+      setTimeout(function () { window.location.href = href; }, 300);
     });
   });
 }
-
 document.addEventListener('DOMContentLoaded', enablePageTransitions);
