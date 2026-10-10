@@ -1,4 +1,6 @@
-# Security hardening — Jueh Tailoring
+# EXPERIMENTAL — Jueh Tailoring security and order-flow patch
+
+> This branch is a sandbox for testing. It does not change `main` by itself. Do not merge or use as the live site until the Apps Script backend, Cloudflare Worker URL, and order submission/lookup flow have been configured and tested.
 
 This branch contains coordinated frontend, Apps Script backend, and Cloudflare Worker changes. **Do not merge until you finish setup and replace the API proxy placeholder**, or API calls will fail.
 
