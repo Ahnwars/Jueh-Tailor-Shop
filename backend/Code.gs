@@ -3,8 +3,7 @@
  * Configure Script Properties:
  *   OWNER_PASSCODE (unique, long password, 20+ chars)
  *   ADMIN_PASSCODE (different unique password, 20+ chars)
- *   SEMAPHORE_API_KEY (optional)
- *   SEMAPHORE_SENDER (optional)
+ *   TEXTBEE_API_KEY (optional)
  *
  * Deploy as Web app, execute as Me, who has access Anyone. Public actions are
  * limited and validated; administrative operations require server-held secrets.
@@ -174,65 +173,49 @@ function normalizeSmsPhone_(contact) {
   } else if (digits.length === 10 && digits.charAt(0) === '9') {
     digits = '63' + digits;
   }
-  // Semaphore expects Philippine mobile numbers in 639XXXXXXXXX format.
+  // TextBee expects E.164 Philippine mobile numbers in 639XXXXXXXXX format.
   return /^639\d{9}$/.test(digits) ? digits : '';
 }
 
-function sendOrderReceivedSms_(contact, orderId) {
-  var apiKey = getSecret_('SEMAPHORE_API_KEY');
-  if (!apiKey) return; // SMS is optional. Order creation must still succeed.
+function sendTextBeeSms_(contact, message, orderId) {
+  var apiKey = getSecret_('TEXTBEE_API_KEY');
+  if (!apiKey) return; // SMS optional until configured.
   var phone = normalizeSmsPhone_(contact);
-  if (!phone) return; // Do not try to text emails, landlines, or malformed numbers.
+  if (!phone) return; // Skip email contacts and malformed numbers.
   try {
-    var sender = getSecret_('SEMAPHORE_SENDER') || 'JuehTailor';
-    var message = 'Jueh Tailoring: We received your order ' + orderId +
-      '. Keep this ID to check your order status. We will text you when it is ready.';
-    var response = UrlFetchApp.fetch('https://api.semaphore.co/api/v4/messages', {
+    var payload = { recipients: [phone], message: message };
+    // Optional device ID; omit it to use the default/most recently active device.
+    var deviceId = getSecret_('TEXTBEE_DEVICE_ID');
+    if (deviceId) payload.deviceId = deviceId;
+    var response = UrlFetchApp.fetch('https://api.textbee.dev/api/v1/gateway/send-sms', {
       method: 'post',
-      payload: { apikey: apiKey, number: phone, message: message, sendername: sender },
+      contentType: 'application/json',
+      headers: { 'x-api-key': apiKey },
+      payload: JSON.stringify(payload),
       muteHttpExceptions: true
     });
-    if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) {
-      Logger.log('Order received SMS failed for order ' + orderId + '. HTTP ' + response.getResponseCode());
+    var code = response.getResponseCode();
+    if (code < 200 || code >= 300) {
+      Logger.log('TextBee SMS failed for order ' + orderId + '. HTTP ' + code);
     }
   } catch (err) {
-    // Notification problems must never undo or block a successfully saved order.
-    Logger.log('Order received SMS failed for order ' + orderId + ': ' + err.message);
+    // Order operations must never fail because a notification provider is unavailable.
+    Logger.log('TextBee SMS failed for order ' + orderId + ': ' + err.message);
   }
 }
 
-function sendDoneEmail_(contact, name, orderId) {
-  try {
-    MailApp.sendEmail({
-      to: contact,
-      subject: 'Your Jueh Tailoring order is ready! 🎉',
-      body: 'Hi ' + name + ',\n\n' +
-        'Great news — your order (' + orderId + ') is done and ready for pick-up!\n\n' +
-        'If you have any questions, message us on Facebook:\n' +
-        'https://www.facebook.com/profile.php?id=100090775430928\n\n' +
-        'Thank you for choosing Jueh Tailoring. 🙏\n' +
-        '— Jueh Tailoring, Manolo Fortich, Bukidnon'
-    });
-  } catch (err) {
-    Logger.log('Email error for ' + orderId + ': ' + err.message);
-  }
+function sendOrderReceivedSms_(contact, orderId) {
+  sendTextBeeSms_(contact,
+    'Jueh Tailoring: We received your order ' + orderId +
+    '. Keep this ID to check your order status. We will text you when it is ready.',
+    orderId);
 }
+
 function sendDoneSms_(contact, name, orderId) {
-  var apiKey = getSecret_('SEMAPHORE_API_KEY');
-  if (!apiKey) return;
-  try {
-    var phone = normalizeSmsPhone_(contact);
-    if (!phone) return;
-    var sender = getSecret_('SEMAPHORE_SENDER') || 'JuehTailor';
-    var message = 'Hi ' + name + '! Your Jueh Tailoring order (' + orderId + ') is ready for pick-up. Questions? Message us on FB. Thank you!';
-    UrlFetchApp.fetch('https://api.semaphore.co/api/v4/messages', {
-      method: 'post',
-      payload: { apikey: apiKey, number: phone, message: message, sendername: sender },
-      muteHttpExceptions: true
-    });
-  } catch (err) {
-    Logger.log('SMS error for ' + orderId + ': ' + err.message);
-  }
+  sendTextBeeSms_(contact,
+    'Hi ' + name + '! Your Jueh Tailoring order (' + orderId +
+    ') is ready for pick-up. Questions? Message us on FB. Thank you!',
+    orderId);
 }
 
 function mimeMatchesBytes_(bytes, mimeType) {
