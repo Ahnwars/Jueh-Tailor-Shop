@@ -174,7 +174,8 @@ function normalizeSmsPhone_(contact) {
     digits = '63' + digits;
   }
   // TextBee expects E.164 Philippine mobile numbers in 639XXXXXXXXX format.
-  return /^639\d{9}$/.test(digits) ? digits : '';
+  // TextBee expects international E.164 format, including the leading plus.
+  return /^639\d{9}$/.test(digits) ? '+' + digits : '';
 }
 
 function sendDoneEmail_(contact, name, orderId) {
