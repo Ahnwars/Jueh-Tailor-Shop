@@ -64,6 +64,30 @@
   white-space: nowrap;
 }
 
+
+.owner-quick-guide {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+  margin: 0 0 20px;
+  padding: 13px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 13px;
+}
+.owner-quick-guide > strong {
+  color: var(--text);
+}
+.owner-quick-guide span {
+  display: inline;
+}
+.owner-quick-guide span strong {
+  color: var(--text);
+}
+
 .owner-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -155,10 +179,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 158px;
-  width: 158px;
-  min-height: 112px;
-  max-height: 180px;
+  flex: 0 0 220px;
+  width: 220px;
+  min-height: 170px;
+  max-height: 240px;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -171,7 +195,7 @@
 .owner-page .design-preview {
   display: block;
   width: 100%;
-  height: 150px;
+  height: 210px;
   object-fit: contain;
   background: var(--surface);
 }
@@ -207,6 +231,23 @@
 
 .owner-page .design-file-info .file-link {
   margin-top: 2px;
+}
+
+
+.owner-page .order-design-missing {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 2px 0 14px;
+  padding: 12px 14px;
+  border: 1px dashed var(--border);
+  border-radius: 7px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.owner-page .order-design-missing strong {
+  color: var(--text);
+  font-size: 13px;
 }
 
 .owner-page .order-design-unavailable {
@@ -261,7 +302,7 @@
   }
 
   .owner-page .design-preview {
-    height: 180px;
+    height: 210px;
   }
 
   .owner-page .design-file-info .file-link {
