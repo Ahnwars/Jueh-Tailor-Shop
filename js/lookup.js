@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const contactInput = document.getElementById('contact');
   const checkBtn = document.getElementById('check-btn');
   const errorEl = document.getElementById('lookup-error');
+  const autofillNotice = document.getElementById('autofill-notice');
   const result = document.getElementById('result');
   const badgeWrap = document.getElementById('badge-wrap');
   const detailGrid = document.getElementById('detail-grid');
@@ -16,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const copyBtn = document.getElementById('copy-btn');
 
   let lastOrderId = '';
+  let wasAutoFilled = false;
 
   function detailRow(label, value) {
     return (
@@ -51,6 +53,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!res || res.status !== 'ok') {
           errorEl.textContent = (res && res.message) || 'Order not found.';
+          if (wasAutoFilled && autofillNotice) {
+            autofillNotice.textContent = 'Your details were filled in automatically, but the order could not be verified. Check the message above and try again.';
+          }
           return;
         }
 
@@ -77,11 +82,17 @@ document.addEventListener('DOMContentLoaded', function () {
         copyBtn.textContent = 'Copy Order ID';
         copyBtn.classList.remove('copied');
         result.classList.add('show');
+        if (wasAutoFilled && autofillNotice) {
+          autofillNotice.textContent = '✅ Your order details transferred automatically. Your latest status is shown below.';
+        }
       })
       .catch(function () {
         checkBtn.disabled = false;
         checkBtn.textContent = 'Check Status';
         errorEl.textContent = 'Could not reach the order system. Check your connection and try again.';
+        if (wasAutoFilled && autofillNotice) {
+          autofillNotice.textContent = 'Your details were filled in automatically, but the order system could not be reached. Check your connection and press Check Status again.';
+        }
       });
   }
 
@@ -127,7 +138,21 @@ document.addEventListener('DOMContentLoaded', function () {
     sessionStorage.removeItem('jt_lookup_prefill');
     if (rawPrefill) prefill = JSON.parse(rawPrefill);
   } catch (ignore) {}
+
   if (prefill && prefill.orderId) orderIdInput.value = prefill.orderId;
   if (prefill && prefill.contact) contactInput.value = prefill.contact;
-  if (prefill && prefill.orderId && prefill.contact) setTimeout(runLookup, 300);
+
+  if (prefill && prefill.orderId && prefill.contact) {
+    wasAutoFilled = true;
+    if (autofillNotice) {
+      autofillNotice.textContent = 'Your Order ID and contact were copied from your order form. Checking your order now…';
+      autofillNotice.classList.remove('hidden');
+    }
+    setTimeout(runLookup, 300);
+  } else if (prefill && prefill.orderId) {
+    if (autofillNotice) {
+      autofillNotice.textContent = 'Your Order ID was filled in automatically. Enter the phone number or email you used to place the order.';
+      autofillNotice.classList.remove('hidden');
+    }
+  }
 });
