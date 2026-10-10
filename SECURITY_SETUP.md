@@ -22,8 +22,8 @@ This branch contains coordinated frontend, Apps Script backend, and Cloudflare W
 4. In Project Settings → Script Properties, add:
    - `OWNER_PASSCODE`: new unique password of at least 20 characters.
    - `ADMIN_PASSCODE`: a different unique password of at least 20 characters.
-   - `SEMAPHORE_API_KEY`: optional; set this to enable SMS, or omit it to disable SMS.
-   - `SEMAPHORE_SENDER`: optional; defaults to `JuehTailor`.
+   - `TEXTBEE_API_KEY`: optional; set this to enable SMS, or omit it to disable SMS.
+   - `TEXTBEE_DEVICE_ID`: optional; omit it to use the default/most recently active phone.
 5. Do not keep/reuse the old OWNER and ADMIN values; they were present in the old submitted source and should be considered exposed.
 6. Save, then Deploy → Manage deployments → Edit → New version. Execute as Me; Who has access: Anyone. Public access is needed for customer orders/lookups, while administrative actions still require a server-side passcode.
 7. In Apps Script, select and run `lockDownDesignFiles` once and approve permissions. This privatizes files uploaded under the older code as well as the folder. Verify the old files' sharing after it runs.
@@ -51,9 +51,17 @@ const API_PROXY_URL = 'https://YOUR-WORKER-SUBDOMAIN.workers.dev';
 
 with your actual Worker URL. Do not change `SHEETS_WEBAPP_URL`; the design-upload HTML form uses the direct Apps Script URL and does not need to read its response. Commit the one-line URL change on this branch, then merge the pull request to main.
 
-## SMS behavior and costs
+## Optional free-tier SMS setup (TextBee)
 
-When `SEMAPHORE_API_KEY` is configured, the backend sends a short SMS after an order is saved and another when the owner changes its status to `Done` (ready for pickup). It only sends SMS to Philippine mobile-number formats; email contacts are not sent SMS. If Semaphore is not configured or the SMS request fails, the order is still saved. Semaphore SMS is a paid service, so check its current pricing and balance before enabling it, and test with your own phone first.
+The code uses TextBee's free plan and sends texts through your own Android phone and SIM rather than charging a gateway fee per message. TextBee currently advertises a free plan with 1 active Android device, up to 50 messages/day, and up to 300 messages/month. Your mobile carrier may still charge for each SMS unless your SIM plan/promo includes texts. The phone needs an active SMS-capable SIM, internet access, and background app access.
+
+1. Create an account at https://textbee.dev/ and open its dashboard.
+2. Install the TextBee Android app from https://textbee.dev/download on the Android phone whose SIM should send the messages; grant SMS permission and register/pair the device.
+3. Generate an API key in the dashboard.
+4. In Apps Script Script Properties, set `TEXTBEE_API_KEY` to that key. Optionally set `TEXTBEE_DEVICE_ID` if you need to select a specific registered phone; otherwise omit it.
+5. Test first with your own phone. Texts are sent when an order is successfully saved and when the owner marks it `Done` (ready for pickup). Email contacts are skipped, and failed SMS does not cancel the order.
+
+TextBee documents the API request and E.164 number format here: https://textbee.dev/docs/sending-sms/sending-sms. Verify the free-plan limits and your carrier's SMS charges before relying on it.
 
 ## 5. Test before reopening orders
 
