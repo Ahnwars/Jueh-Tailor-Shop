@@ -6,7 +6,8 @@
  */
 const SHEETS_WEBAPP_URL =
   'https://script.google.com/macros/s/AKfycbzuMffaNSwWTS6-WVNrkcIyAJMedH8XuW4rYbwRKK-fC_YncLELw8c2Ul7N-TudQTuD/exec';
-window.SHEETS_WEBAPP_URL = SHEETS_WEBAPP_URL;
+window.SHEETS_WEBAPP_URL = SHEETS_WEBAPP_URL; // Direct HTML-form upload only; not a secret.
+const API_PROXY_URL = 'https://YOUR-WORKER-SUBDOMAIN.workers.dev'; // Set this before merging.
 const REQUEST_TIMEOUT_MS = 15000;
 
 function callApi(action, params) {
@@ -14,7 +15,7 @@ function callApi(action, params) {
   const timer = setTimeout(function () { controller.abort(); }, REQUEST_TIMEOUT_MS);
   const payload = Object.assign({}, params || {}, { action: action });
 
-  return fetch(SHEETS_WEBAPP_URL, {
+  return fetch(API_PROXY_URL, {
     method: 'POST',
     mode: 'cors',
     redirect: 'follow',
