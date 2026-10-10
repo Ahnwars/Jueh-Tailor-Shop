@@ -120,15 +120,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // If the order page linked here with ?orderId=...&contact=..., fill the
-  // fields in and check automatically so the customer doesn't retype anything.
-  const params = new URLSearchParams(window.location.search);
-  const prefilledId = params.get('orderId');
-  const prefilledContact = params.get('contact');
-
-  if (prefilledId) orderIdInput.value = prefilledId;
-  if (prefilledContact) contactInput.value = prefilledContact;
-  if (prefilledId && prefilledContact) {
-    setTimeout(runLookup, 300);
-  }
+  // Consume the one-time prefill from sessionStorage; never put contact data in the URL.
+  let prefill = null;
+  try {
+    const rawPrefill = sessionStorage.getItem('jt_lookup_prefill');
+    sessionStorage.removeItem('jt_lookup_prefill');
+    if (rawPrefill) prefill = JSON.parse(rawPrefill);
+  } catch (ignore) {}
+  if (prefill && prefill.orderId) orderIdInput.value = prefill.orderId;
+  if (prefill && prefill.contact) contactInput.value = prefill.contact;
+  if (prefill && prefill.orderId && prefill.contact) setTimeout(runLookup, 300);
 });
