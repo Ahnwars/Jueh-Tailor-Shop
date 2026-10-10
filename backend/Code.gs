@@ -177,6 +177,23 @@ function normalizeSmsPhone_(contact) {
   return /^639\d{9}$/.test(digits) ? digits : '';
 }
 
+function sendDoneEmail_(contact, name, orderId) {
+  try {
+    MailApp.sendEmail({
+      to: contact,
+      subject: 'Your Jueh Tailoring order is ready! 🎉',
+      body: 'Hi ' + name + ',\n\n' +
+        'Great news — your order (' + orderId + ') is done and ready for pick-up!\n\n' +
+        'If you have any questions, message us on Facebook:\n' +
+        'https://www.facebook.com/profile.php?id=100090775430928\n\n' +
+        'Thank you for choosing Jueh Tailoring. 🙏\n' +
+        '— Jueh Tailoring, Manolo Fortich, Bukidnon'
+    });
+  } catch (err) {
+    Logger.log('Email error for ' + orderId + ': ' + err.message);
+  }
+}
+
 function sendTextBeeSms_(contact, message, orderId) {
   var apiKey = getSecret_('TEXTBEE_API_KEY');
   if (!apiKey) return; // SMS optional until configured.
@@ -315,10 +332,12 @@ function handleRequest_(p, method) {
     var cache = CacheService.getScriptCache();
     if (cache.get(cacheKey)) return errorOut_('Please wait one minute before submitting another order with this contact.');
     var lock = LockService.getScriptLock();
+    var orderId = '';
+    var uploadToken = '';
     try {
       lock.waitLock(5000);
-      var orderId = makeOrderId_();
-      var uploadToken = makeUploadToken_();
+      orderId = makeOrderId_();
+      uploadToken = makeUploadToken_();
       getOrdersSheet_().appendRow([
         orderId, new Date(), safeText_(name, 100), safeText_(contact, 150),
         safeText_(itemType, 100), quantity, safeText_(p.sizes, 500),
@@ -326,15 +345,15 @@ function handleRequest_(p, method) {
         safeText_(p.budget, 100), 'New', '', '', hashToken_(uploadToken)
       ]);
       cache.put(cacheKey, '1', 60);
-      // Best-effort SMS after the order is safely saved; SMS failure doesn't block it.
-      sendOrderReceivedSms_(contact, orderId);
-      return jsonOut_({ status: 'ok', orderId: orderId, uploadToken: uploadToken });
     } catch (err) {
       Logger.log('Order creation error: ' + err.message);
       return errorOut_('The order could not be saved. Please try again.');
     } finally {
       try { lock.releaseLock(); } catch (ignore) {}
     }
+    // Send SMS outside the sheet lock. Failures never undo the saved order.
+    sendOrderReceivedSms_(contact, orderId);
+    return jsonOut_({ status: 'ok', orderId: orderId, uploadToken: uploadToken });
   }
 
   if (action === 'lookupOrder') {
