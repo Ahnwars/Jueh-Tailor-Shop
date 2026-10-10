@@ -9,6 +9,7 @@ This branch contains coordinated frontend, Apps Script backend, and Cloudflare W
 - Uses unpredictable order IDs and a single-use upload token (only its SHA-256 hash is stored in the sheet).
 - Checks the site-open flag server-side, validates fields and allowed order statuses, and limits design uploads to JPG/PNG/WEBP/PDF up to 5 MB with magic-byte verification.
 - Keeps newly uploaded design files private and removes file links from public lookup responses.
+- Sends an optional SMS when an order is received and when it is marked ready for pickup; failed SMS delivery does not cancel an order.
 - Includes a cleanup function for older files that may already have “anyone with link” sharing.
 - Stops adding customer contact details to lookup URLs.
 - Uses a small Worker proxy because a static GitHub Pages page cannot reliably read Apps Script ContentService responses cross-origin.
@@ -21,7 +22,7 @@ This branch contains coordinated frontend, Apps Script backend, and Cloudflare W
 4. In Project Settings → Script Properties, add:
    - `OWNER_PASSCODE`: new unique password of at least 20 characters.
    - `ADMIN_PASSCODE`: a different unique password of at least 20 characters.
-   - `SEMAPHORE_API_KEY`: optional; omit it to disable SMS.
+   - `SEMAPHORE_API_KEY`: optional; set this to enable SMS, or omit it to disable SMS.
    - `SEMAPHORE_SENDER`: optional; defaults to `JuehTailor`.
 5. Do not keep/reuse the old OWNER and ADMIN values; they were present in the old submitted source and should be considered exposed.
 6. Save, then Deploy → Manage deployments → Edit → New version. Execute as Me; Who has access: Anyone. Public access is needed for customer orders/lookups, while administrative actions still require a server-side passcode.
@@ -50,7 +51,11 @@ const API_PROXY_URL = 'https://YOUR-WORKER-SUBDOMAIN.workers.dev';
 
 with your actual Worker URL. Do not change `SHEETS_WEBAPP_URL`; the design-upload HTML form uses the direct Apps Script URL and does not need to read its response. Commit the one-line URL change on this branch, then merge the pull request to main.
 
-## 4. Test before reopening orders
+## SMS behavior and costs
+
+When `SEMAPHORE_API_KEY` is configured, the backend sends a short SMS after an order is saved and another when the owner changes its status to `Done` (ready for pickup). It only sends SMS to Philippine mobile-number formats; email contacts are not sent SMS. If Semaphore is not configured or the SMS request fails, the order is still saved. Semaphore SMS is a paid service, so check its current pricing and balance before enabling it, and test with your own phone first.
+
+## 5. Test before reopening orders
 
 - New order without a file; verify it is in the sheet and lookup works.
 - New order with a valid file under 5 MB; verify it is attached and not public.
