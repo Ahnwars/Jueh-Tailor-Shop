@@ -1,0 +1,275 @@
+/* Owner dashboard enhancements; isolated from the admin page. */
+
+.owner-page main {
+  padding-top: 32px;
+}
+
+.owner-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.owner-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 7px;
+  background: var(--amber);
+  color: var(--navy);
+  font-family: var(--font-head);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.owner-header-subtitle {
+  display: block;
+  color: #b9c2d4;
+  font-size: 12px;
+}
+
+.owner-dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.owner-eyebrow {
+  margin-bottom: 5px;
+  color: var(--rust);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+.owner-heading {
+  margin-bottom: 7px;
+  font-size: clamp(24px, 3vw, 32px);
+}
+
+.owner-subtitle {
+  max-width: 620px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.owner-refresh {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.owner-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.owner-stat {
+  min-width: 0;
+  padding: 15px 17px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.owner-stat-label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.owner-stat-value {
+  display: block;
+  color: var(--text);
+  font-family: var(--font-head);
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.owner-toolbar {
+  margin-bottom: 8px;
+}
+
+.owner-design-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 7px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.owner-design-filter input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--navy);
+}
+
+.owner-feedback {
+  min-height: 20px;
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.owner-page .order {
+  padding: 20px;
+}
+
+.owner-page .order-head {
+  margin-bottom: 16px;
+}
+
+.owner-page .order-info {
+  margin-bottom: 12px;
+}
+
+.owner-page .order-design {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 2px 0 14px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--page);
+}
+
+.owner-page .design-preview-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 158px;
+  width: 158px;
+  min-height: 112px;
+  max-height: 180px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--muted);
+  text-align: center;
+  text-decoration: none;
+}
+
+.owner-page .design-preview {
+  display: block;
+  width: 100%;
+  height: 150px;
+  object-fit: contain;
+  background: var(--surface);
+}
+
+.owner-page .design-preview[hidden],
+.owner-page .design-preview-fallback[hidden] {
+  display: none !important;
+}
+
+.owner-page .design-preview-fallback {
+  padding: 15px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.owner-page .design-file-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  min-width: 0;
+  font-size: 13px;
+}
+
+.owner-page .design-file-info strong {
+  font-size: 15px;
+}
+
+.owner-page .design-file-info p {
+  margin-bottom: 5px;
+  color: var(--muted);
+}
+
+.owner-page .design-file-info .file-link {
+  margin-top: 2px;
+}
+
+.owner-page .order-design-unavailable {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@media (max-width: 700px) {
+  .owner-page main {
+    padding-top: 22px;
+  }
+
+  .owner-dashboard-header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .owner-refresh {
+    width: 100%;
+  }
+
+  .owner-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .owner-stat {
+    padding: 12px 14px;
+  }
+
+  .owner-stat-value {
+    font-size: 25px;
+  }
+
+  .owner-page .order {
+    padding: 15px;
+  }
+
+  .owner-page .order-design {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .owner-page .design-preview-link {
+    width: 100%;
+    max-width: 100%;
+    min-height: 130px;
+    max-height: 200px;
+    flex-basis: auto;
+  }
+
+  .owner-page .design-preview {
+    height: 180px;
+  }
+
+  .owner-page .design-file-info .file-link {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .owner-design-filter {
+    flex: 1 1 auto;
+  }
+}
