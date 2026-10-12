@@ -480,15 +480,12 @@ function setupOrderForm() {
         if (chosen) chosen.classList.add('hidden');
         if (dropUi) dropUi.style.display = '';
       })
-      .catch(function (error) {
+      .catch(function () {
         submitting = false;
         submitBtn.disabled = false;
         submitBtn.textContent = 'Send Order Request';
         message.className = 'form-message error show';
-        message.textContent = apiErrorMessage(
-          error,
-          'We could not confirm your order was saved.'
-        ) + ' If you are unsure whether it went through, contact the shop before submitting again to avoid a duplicate order.';
+        message.textContent = 'Connection error — check your network and try again.';
       });
   }
 
