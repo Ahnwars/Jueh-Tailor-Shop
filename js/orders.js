@@ -204,10 +204,10 @@ OrderBoard.prototype.saveOrder = function (button) {
         button.classList.remove('saved');
       }, 2000);
     })
-    .catch(function () {
+    .catch(function (error) {
       button.disabled = false;
       button.textContent = 'Save';
-      alert('Connection error. Try again.');
+      alert(apiErrorMessage(error, 'Could not save the order. Please try again.'));
     });
 };
 
