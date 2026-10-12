@@ -184,7 +184,9 @@ OrderBoard.prototype.saveOrder = function (button) {
       order['Status'] = newStatus;
       order['Owner Note'] = note;
 
-      const original = self.allOrders.find(function (o) { return o['Order ID'] === orderId; });
+      const original = self.allOrders.find(function (o) {
+        return (o['OrderID'] || o['Order ID']) === orderId;
+      });
       if (original) {
         original['Status'] = newStatus;
         original['Owner Note'] = note;
