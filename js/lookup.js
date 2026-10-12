@@ -86,10 +86,10 @@ document.addEventListener('DOMContentLoaded', function () {
         copyBtn.classList.remove('copied');
         result.classList.add('show');
       })
-      .catch(function (error) {
+      .catch(function () {
         checkBtn.disabled = false;
         checkBtn.textContent = 'Check Status';
-        errorEl.textContent = apiErrorMessage(error, 'Could not reach the order system. Please try again.');
+        errorEl.textContent = 'Could not reach the order system. Check your connection and try again.';
       });
   }
 
@@ -205,10 +205,10 @@ document.addEventListener('DOMContentLoaded', function () {
           });
         });
       })
-      .catch(function (error) {
+      .catch(function () {
         recoverBtn.disabled = false;
         recoverBtn.textContent = 'Find My Orders';
-        recoverError.textContent = apiErrorMessage(error, 'Could not connect to the order system. Try again.');
+        recoverError.textContent = 'Connection error. Try again.';
       });
   });
 
