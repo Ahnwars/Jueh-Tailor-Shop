@@ -5,7 +5,7 @@
  */
 
 const SHEETS_WEBAPP_URL =
-  'https://script.google.com/macros/s/AKfycbzuMffaNSwWTS6-WVNrkcIyAJMedH8XuW4rYbwRKK-fC_YncLELw8c2Ul7N-TudQTuD/exec';
+  'https://script.google.com/macros/s/AKfycbxCI7z5Q4ouI3XZhbcV2V5nKGIYe0QlGiMQnoRLzF804Zm6xoxc4QjdXFZs2IlJY0aS/exec';
 
 // Also expose on window so other scripts (home.js uploadDesignFile) can reach it
 window.SHEETS_WEBAPP_URL = SHEETS_WEBAPP_URL;
