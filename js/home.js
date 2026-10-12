@@ -487,8 +487,8 @@ function setupOrderForm() {
         message.className = 'form-message error show';
         message.textContent = apiErrorMessage(
           error,
-          'We could not confirm your order was saved. Before submitting again, please contact the shop to avoid a duplicate order.'
-        );
+          'We could not confirm your order was saved.'
+        ) + ' If you are unsure whether it went through, contact the shop before submitting again to avoid a duplicate order.';
       });
   }
 
