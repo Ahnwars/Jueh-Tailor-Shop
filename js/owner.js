@@ -53,10 +53,10 @@ document.addEventListener('DOMContentLoaded', function () {
         sessionStorage.setItem('ownerPasscode', passcode);
         showDashboard(res.orders || []);
       })
-      .catch(function (error) {
+      .catch(function () {
         loginBtn.disabled = false;
         loginBtn.textContent = 'Enter';
-        gateError.textContent = apiErrorMessage(error, 'Could not connect to the order system. Try again.');
+        gateError.textContent = 'Connection error. Try again.';
       });
   }
 
