@@ -97,10 +97,10 @@ document.addEventListener('DOMContentLoaded', function () {
         sessionStorage.setItem('adminGateRole', '0');
         enterDashboard(res.orders || []);
       })
-      .catch(function (error) {
+      .catch(function () {
         button.disabled = false;
         button.textContent = 'Enter as Owner';
-        gateError.textContent = apiErrorMessage(error, 'Could not connect to the order system. Try again.');
+        gateError.textContent = 'Connection error. Try again.';
       });
   }
 
@@ -135,10 +135,10 @@ document.addEventListener('DOMContentLoaded', function () {
         sessionStorage.setItem('adminGateRole', '1');
         enterDashboard(res.orders || []);
       })
-      .catch(function (error) {
+      .catch(function () {
         button.disabled = false;
         button.textContent = 'Enter as Admin';
-        gateError.textContent = apiErrorMessage(error, 'Could not connect to the order system. Try again.');
+        gateError.textContent = 'Connection error. Try again.';
       });
   }
 
@@ -188,10 +188,10 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('site-status-desc').textContent = 'Update failed.';
           }
         })
-        .catch(function (error) {
+        .catch(function () {
           toggling = false;
           toggle.checked = siteOpen;
-          document.getElementById('site-status-desc').textContent = apiErrorMessage(error, 'Could not update site status.');
+          document.getElementById('site-status-desc').textContent = 'Connection error.';
         });
     });
   }
