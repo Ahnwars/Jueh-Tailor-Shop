@@ -261,6 +261,7 @@ function uploadDesignFile(file, orderId, uploadToken) {
       var fields = {
         action:   'uploadFile',
         orderId:  orderId,
+        uploadToken: uploadToken,
         filename: file.name,
         mimeType: file.type || 'application/octet-stream',
         data:     base64Data
