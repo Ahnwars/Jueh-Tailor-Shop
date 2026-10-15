@@ -235,7 +235,7 @@ function setupFileDrop() {
  * Because we cannot read the iframe's response, this is fire-and-forget:
  * the order is already saved; Apps Script will attach the Drive link to it.
  */
-function uploadDesignFile(file, orderId) {
+function uploadDesignFile(file, orderId, uploadToken) {
   return new Promise(function (resolve) {
     var reader = new FileReader();
 
@@ -253,7 +253,7 @@ function uploadDesignFile(file, orderId) {
 
       var form = document.createElement('form');
       form.method  = 'POST';
-      form.action  = window.SHEETS_WEBAPP_URL || '';
+      form.action  = window.API_PROXY_URL || '';
       form.target  = frameName;
       // application/x-www-form-urlencoded so Apps Script reads e.parameter
       form.enctype = 'application/x-www-form-urlencoded';
@@ -464,7 +464,7 @@ function setupOrderForm() {
         if (chosenFile) {
           message.className = 'form-message uploading show';
           message.textContent = '✅ Order received! Uploading your design file…';
-          uploadDesignFile(chosenFile, orderId).then(function () {
+          uploadDesignFile(chosenFile, orderId, res.uploadToken).then(function () {
             redirect(orderId, payload.contact);
           });
         } else {
