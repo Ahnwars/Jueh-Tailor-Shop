@@ -481,12 +481,24 @@ function setupOrderForm() {
         if (chosen) chosen.classList.add('hidden');
         if (dropUi) dropUi.style.display = '';
       })
-      .catch(function () {
+      .catch(function (error) {
         submitting = false;
         submitBtn.disabled = false;
         submitBtn.textContent = 'Send Order Request';
         message.className = 'form-message error show';
-        message.textContent = 'Connection error — check your network and try again.';
+
+        // Keep setup errors actionable instead of masking them as network issues.
+        const detail = error && error.message ? error.message : '';
+        if (detail.indexOf('Backend proxy is not configured') !== -1) {
+          message.textContent = 'Order service is not configured yet. Please contact the shop and try again later.';
+          console.error('[Jueh Tailor] API proxy is not configured.');
+        } else if (detail.indexOf('timed out') !== -1 || detail.indexOf('AbortError') !== -1) {
+          message.textContent = 'The order service took too long to respond. Please try again in a moment.';
+          console.error('[Jueh Tailor] Order request timed out.', error);
+        } else {
+          message.textContent = 'Could not connect to the order service. Please try again in a moment.';
+          console.error('[Jueh Tailor] Order request failed.', error);
+        }
       });
   }
 
